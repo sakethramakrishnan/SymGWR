@@ -1,0 +1,99 @@
+========================================================================
+pycalphad CALPHAD reference timing (calculate + equilibrium)
+========================================================================
+TDB path:        /home/saketh/Documents/saketh/gwr/experiments/calphad_ref_data/mc_fe_v2.059.pycalphad.tdb
+TDB source URL:  https://raw.githubusercontent.com/pycalphad/pycalphad/develop/examples/databases/mc_fe_v2.059.pycalphad.tdb
+TDB provenance:  MatCalc mc_fe_v2.059 (E. Povoden-Karadeniz, TU Wien); redistributed in pycalphad examples/databases/
+TDB license:     ODbL 1.0 / DbCL 1.0 (per TDB file header)
+mode:            calculate_precompiled
+
+--- environment ---
+CPU:             AMD Ryzen 7 5700U with Radeon Graphics
+OS:              Linux-7.0.0-30-generic-x86_64-with-glibc2.43
+Python:          3.12.14 (/home/saketh/Documents/saketh/gwr/.venv_pycalphad/bin/python)
+pycalphad:       0.11.2
+
+--- Database cache ---
+database_cache:  HIT
+database_source: /home/saketh/Documents/saketh/gwr/experiments/calphad_ref_data/model_cache/database__mc_fe_v2.059.pycalphad.tdb__467211ab854400ac.pkl
+database_load_s: 0.118451
+content_sha256:  467211ab854400ac6d247bdfb97069d37e021cfced6b8dbb30c0334b74ee1508
+pickle_path:     /home/saketh/Documents/saketh/gwr/experiments/calphad_ref_data/model_cache/database__mc_fe_v2.059.pycalphad.tdb__467211ab854400ac.pkl
+
+equilibrium_phases: ['LIQUID', 'FCC_A1', 'BCC_A2', 'HCP_A3', 'CEMENTITE', 'SIGMA', 'M23C6', 'M7C3']
+calculate_phase:    FCC_A1
+calculate_reason:   FCC_A1 (austenite) is the substitutional matrix / majority phase for the Fe-Cr-Ni-rich compositions in this query set; single-phase G(X,T) on FCC_A1 is the operation GWR approximates, not multi-phase equilibrium.
+
+========================================================================
+pycalphad CALPHAD calculate_precompiled reference timing
+========================================================================
+function:        calculate() with phase_records+model reused (NOT bare calculate each call)
+config_id:       calculate_precompiled__mc_fe_v2.059.pycalphad.tdb__8comp__FCC_A1__nq100__9963a5a7898e
+Components:      ['FE', 'CR', 'NI', 'C', 'MN', 'MO', 'SI', 'VA']
+phase:           FCC_A1
+phase_reason:    FCC_A1 (austenite) is the substitutional matrix / majority phase for the Fe-Cr-Ni-rich compositions in this query set; single-phase G(X,T) on FCC_A1 is the operation GWR approximates, not multi-phase equilibrium.
+precompile_note: Model + PhaseRecordFactory built once before warm-up; passed to every calculate() via phase_records=... and model=...
+n_query_points:  8
+n_timed_queries: 100
+timing_csv:      /home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad__calculate_precompiled__mc_fe_v2.059.pycalphad.tdb__8comp__FCC_A1__nq100__9963a5a7898e.csv
+stable_csv:      /home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad_calculate_precompiled.csv
+
+timing_cache:    MISS
+
+precompile_build_s: 0.171232  (excluded from per-query timing)
+
+--- warm-up (discarded from timing) ---
+  warmup[0] T=900K X(CR,NI,C,MN,MO,SI)=(0.12,0.08,0.005,0.01,0.005,0.005) wall_s=0.020923 GM=-40159
+  warmup[1] T=1000K X(CR,NI,C,MN,MO,SI)=(0.18,0.08,0.01,0.01,0.01,0.005) wall_s=0.001290 GM=-47531.1
+  warmup[2] T=1100K X(CR,NI,C,MN,MO,SI)=(0.18,0.1,0.008,0.015,0.008,0.01) wall_s=0.001148 GM=-56723.4
+  warmup[3] T=1200K X(CR,NI,C,MN,MO,SI)=(0.2,0.12,0.005,0.02,0.01,0.01) wall_s=0.001128 GM=-65503.6
+  warmup[4] T=1050K X(CR,NI,C,MN,MO,SI)=(0.1,0.2,0.002,0.005,0.002,0.005) wall_s=0.001006 GM=-53635.7
+  warmup[5] T=950K X(CR,NI,C,MN,MO,SI)=(0.15,0.05,0.015,0.02,0.015,0.008) wall_s=0.000884 GM=-43858.5
+  warmup[6] T=1300K X(CR,NI,C,MN,MO,SI)=(0.18,0.08,0.01,0.01,0.01,0.005) wall_s=0.000786 GM=-71601.2
+  warmup[7] T=800K X(CR,NI,C,MN,MO,SI)=(0.12,0.08,0.01,0.01,0.005,0.005) wall_s=0.000808 GM=-33096.4
+
+--- timed queries ---
+  query 1/100 point=0 T=900K dt_ms=0.864 GM=-40159
+  query 10/100 point=1 T=1000K dt_ms=0.801 GM=-47531.1
+  query 20/100 point=3 T=1200K dt_ms=0.858 GM=-65503.6
+  query 30/100 point=5 T=950K dt_ms=1.116 GM=-43858.5
+  query 40/100 point=7 T=800K dt_ms=0.948 GM=-33096.4
+  query 50/100 point=1 T=1000K dt_ms=0.824 GM=-47531.1
+  query 60/100 point=3 T=1200K dt_ms=0.777 GM=-65503.6
+  query 70/100 point=5 T=950K dt_ms=0.787 GM=-43858.5
+  query 80/100 point=7 T=800K dt_ms=0.765 GM=-33096.4
+  query 90/100 point=1 T=1000K dt_ms=0.947 GM=-47531.1
+  query 100/100 point=3 T=1200K dt_ms=0.754 GM=-65503.6
+
+--- summary ---
+n_timed_queries:     100
+timed_total_wall_s:  0.090551
+database_load_s:     0.118451
+mean_ms:             0.873543
+p50_ms:              0.828162
+p95_ms:              1.116290
+p99_ms:              1.188582
+min_ms:              0.737988
+max_ms:              1.241875
+quantiles_monotonic: True
+csv_written:         /home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad__calculate_precompiled__mc_fe_v2.059.pycalphad.tdb__8comp__FCC_A1__nq100__9963a5a7898e.csv
+stable_csv_written:  /home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad_calculate_precompiled.csv
+csv_rows:            100
+
+========================================================================
+SIDE-BY-SIDE: bare calculate() vs calculate_precompiled
+========================================================================
+metric                 bare calc ms   precompiled ms     bare/pre
+mean_ms                   70.481023         0.873543        80.68x
+p50_ms                    70.004993         0.828162        84.53x
+p95_ms                    75.284473         1.116290        67.44x
+p99_ms                    77.098172         1.188582        64.87x
+min_ms                    66.615565         0.737988        90.27x
+max_ms                    82.532737         1.241875        66.46x
+
+NOTE: bare calculate() rebuilds Model+PhaseRecordFactory each call (build_functions LLVM callables still LRU-cached globally). calculate_precompiled reuses phase_records+model.
+
+--- cache inventory ---
+Database pickle: /home/saketh/Documents/saketh/gwr/experiments/calphad_ref_data/model_cache/database__mc_fe_v2.059.pycalphad.tdb__467211ab854400ac.pkl [HIT]
+precompiled CSV: /home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad__calculate_precompiled__mc_fe_v2.059.pycalphad.tdb__8comp__FCC_A1__nq100__9963a5a7898e.csv [MISS]
+precompiled alias: /home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad_calculate_precompiled.csv

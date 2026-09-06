@@ -1,0 +1,39 @@
+{
+  "config_id": "equilibrium__mc_fe_v2.059.pycalphad.tdb__8comp__8ph__nq100__4e38a57df476",
+  "csv_path": "/home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad__equilibrium__mc_fe_v2.059.pycalphad.tdb__8comp__8ph__nq100__4e38a57df476.csv",
+  "meta_path": "/home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad__equilibrium__mc_fe_v2.059.pycalphad.tdb__8comp__8ph__nq100__4e38a57df476.json",
+  "cache": "HIT",
+  "source": "/home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad__equilibrium__mc_fe_v2.059.pycalphad.tdb__8comp__8ph__nq100__4e38a57df476.csv",
+  "function": "equilibrium",
+  "stats_ms": {
+    "mean_ms": 5309.38410166,
+    "p50_ms": 5333.7398975,
+    "p95_ms": 6254.2775428,
+    "p99_ms": 6518.713480880001,
+    "min_ms": 3969.733796,
+    "max_ms": 6660.495725
+  },
+  "timed_total_wall_s_approx_from_sum": 530.938410166,
+  "database_load_s": 0.12004017698927782,
+  "n_queries": 100,
+  "phases": [
+    "LIQUID",
+    "FCC_A1",
+    "BCC_A2",
+    "HCP_A3",
+    "CEMENTITE",
+    "SIGMA",
+    "M23C6",
+    "M7C3"
+  ],
+  "components": [
+    "FE",
+    "CR",
+    "NI",
+    "C",
+    "MN",
+    "MO",
+    "SI",
+    "VA"
+  ]
+}

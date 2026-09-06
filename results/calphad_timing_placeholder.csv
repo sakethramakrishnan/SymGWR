@@ -1,0 +1,3 @@
+mode,n_queries,gwr_mean_us,gwr_std_us,gwr_min_us,gwr_max_us,gwr_p95_us,calphad_query_time_us,calphad_query_time_us_note
+single_query,100,82.56255000000002,23.119921969753708,70.222,262.534,121.69014999999999,,manual_input_required_from_vendor_or_coauthor
+batch,100,5.534400000000001,0.0,5.534400000000001,5.534400000000001,5.534400000000001,,manual_input_required_from_vendor_or_coauthor

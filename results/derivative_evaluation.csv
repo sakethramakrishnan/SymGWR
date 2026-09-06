@@ -1,0 +1,3 @@
+repeat,seed,degree,n_neighbors,derivative_mode,derivative_mae,derivative_mse
+1,42,3,5,local_finite_difference_proxy,0.0900232289536664,0.026475163548163035
+2,43,3,5,local_finite_difference_proxy,0.0899028832448476,0.026422507812182052

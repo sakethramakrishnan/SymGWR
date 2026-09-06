@@ -1,0 +1,2 @@
+mode,n_queries,degree,n_neighbors,random_state,mean_us,std_us,min_us,p50_us,p95_us,p99_us,max_us,quantiles_monotonic,sampling
+single_query,10000,5,1,0,48.8086289,6.052373585080881,42.49,46.958,59.041,77.24560000000002,122.009,True,with_replacement_from_test_split_same_run

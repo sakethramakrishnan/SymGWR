@@ -1,0 +1,9 @@
+degree,n_neighbors,n_repeats,gwr_mape_mean_mean,gwr_mape_mean_std,gwr_smape_mean_mean,gwr_smape_mean_std,gwr_mae_mean_mean,gwr_r2_mean,best_degree_flag,source_row,source_file
+1,5,2,0.00233672,0.000391271,0.00237937,0.000429357,0.0011824,0.999996,,"row_index=0, degree=1, n_neighbors=5",results/ablation_degree.csv
+2,5,2,0.00114692,0.000212854,0.00111889,0.000191601,0.000229889,1,,"row_index=1, degree=2, n_neighbors=5",results/ablation_degree.csv
+3,5,2,0.00110076,0.000201056,0.00107855,0.000184263,0.000219153,1,,"row_index=2, degree=3, n_neighbors=5",results/ablation_degree.csv
+4,5,2,0.00107909,0.0001978,0.0010576,0.000181773,0.000221102,1,,"row_index=3, degree=4, n_neighbors=5",results/ablation_degree.csv
+5,5,2,0.00109103,0.000208824,0.00106793,0.000191621,0.000220137,1,,"row_index=4, degree=5, n_neighbors=5",results/ablation_degree.csv
+6,5,2,0.00107992,0.000204849,0.00105735,0.000188038,0.000218972,1,,"row_index=5, degree=6, n_neighbors=5",results/ablation_degree.csv
+7,5,2,0.00107878,0.000203085,0.00105622,0.000186351,0.000219541,1,yes,"row_index=6, degree=7, n_neighbors=5",results/ablation_degree.csv
+8,5,2,0.00701552,0.000768197,0.00596444,0.000140786,0.00254931,0.999967,,"row_index=7, degree=8, n_neighbors=5",results/ablation_degree.csv

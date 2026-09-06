@@ -1,0 +1,2 @@
+comparison,metric,best_baseline_model,t_statistic,p_value_two_sided,n_gwr,n_baseline,seed_convention,split,split_protocol,locked_degree,locked_k,source_error_vectors,source_table_for_best_baseline,source_script
+Polynomial GWR vs best_black_box_baseline,absolute_percentage_error,XGBoost,-4.658433533969057,3.211305696642254e-06,16370,16370,0..9,test,0.6/0.2/0.2,5,1,in-memory from per-seed test predictions in run_locked_baseline_refresh.py,results/baseline_table_locked.csv:mape_mean,experiments/run_locked_baseline_refresh.py

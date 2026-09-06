@@ -1,0 +1,4 @@
+| configuration | selected_degree | selected_neighbors | mae | mse | rmse | mape | smape | r2 | runtime_s | source_row | source_file |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Polynomial Base | 4 | 2 | 0.000674179 | 1.44909e-06 | 0.00120378 | 0.00267324 | 0.00261775 | 0.999999 | 2.19489 | row_index=1, repeat=2, seed=43, base_model=polynomial, selected_degree=4, selected_n_neighbors=2, relative=False | results/gwr_results_raw.csv |
+| Polynomial GWR | 4 | 2 | 8.25277e-05 | 1.12702e-08 | 0.000106161 | 0.000322797 | 0.000322113 | 1 | 2.19489 | row_index=1, repeat=2, seed=43, base_model=polynomial, selected_degree=4, selected_n_neighbors=2, relative=False | results/gwr_results_raw.csv |

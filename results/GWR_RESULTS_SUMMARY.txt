@@ -1,0 +1,78 @@
+================================================================================
+GWR EVALUATION RESULTS - ALL POLYNOMIAL DEGREES (1-10) × NEIGHBORS (1-10)
+================================================================================
+
+COMPLETION STATUS: ✓ COMPLETE (100/100 configurations evaluated)
+
+KEY FINDINGS:
+=============
+
+1. BEST OVERALL PERFORMANCE:
+   - Lowest MAPE: 0.00008458 (Degree 3, Neighbors 2)
+   - This represents the best-fit equation for predicting Gibbs energy
+
+2. BEST BY DEGREE (average MAPE across all neighbor counts):
+   - Degree 3: 0.000180 ± 0.000068 (BEST)
+   - Degree 2: 0.000200 ± 0.000081
+   - Degree 4: 0.000229 ± 0.000099
+   - Degree 5: 0.000259 ± 0.000129
+   - Degree 1: 0.000396 ± 0.000141
+   - Degree 6: 0.000517 ± 0.000277
+   - Degree 7: 0.001010 ± 0.000518
+   - Degree 8: 0.002095 ± 0.001145
+   - Degree 9: 0.006196 ± 0.003472
+   - Degree 10: 0.014301 ± 0.007845 (WORST - overfitting)
+
+3. BEST BY NUMBER OF NEIGHBORS (average MAPE across all degrees):
+   - Neighbors 2: 0.000735 ± 0.001417 (BEST)
+   - Neighbors 4: 0.000974 ± 0.001805
+   - Neighbors 3: 0.001285 ± 0.002300
+   - Neighbors 5: 0.001414 ± 0.002584
+   - Neighbors 6: 0.001853 ± 0.003441
+   - Neighbors 1: 0.002716 ± 0.004946
+   - Neighbors 7: 0.002740 ± 0.005196
+   - Neighbors 8: 0.004082 ± 0.007845
+   - Neighbors 9: 0.006006 ± 0.011734
+   - Neighbors 10: 0.007860 ± 0.015472 (WORST)
+
+4. INTERPRETATION:
+   - Polynomial degrees 2-4 provide optimal balance between complexity and generalization
+   - Using 2 neighbors provides the best local approximation
+   - Higher degree polynomials (8-10) show signs of overfitting with rapidly degrading MAPE
+   - More neighbors tend to increase averaging error and reduce performance
+
+RECOMMENDED CONFIGURATION:
+===========================
+- Polynomial Degree: 3 or 4
+- Number of Neighbors: 2-4
+- Expected MAPE: ~0.0001-0.0003 (~0.01-0.03% error)
+
+FILES GENERATED:
+=================
+✓ gwr_polynomial_evaluation_all_degrees.csv - Raw data (degree, neighbors, mape, mape_std)
+✓ gwr_3d_plot.png - 3D scatter plot visualization
+✓ gwr_3d_plot_alt.png - Alternative 3D view
+✓ gwr_heatmap.png - Heatmap showing MAPE by degree and neighbors
+
+DATA STRUCTURE:
+================
+100 total evaluations (10 degrees × 10 neighbor counts)
+Each row contains:
+  - degree: Polynomial degree (1-10)
+  - n_neighbors: Number of neighbors (1-10)
+  - mape: Mean Absolute Percentage Error
+  - mape_std: Standard deviation of MAPE
+
+STATISTICAL INSIGHTS:
+=======================
+- Clear bias-variance tradeoff: lower degrees = higher bias, higher degrees = higher variance
+- Optimal sweet spot at degree 3-4 with 2-4 neighbors
+- Diminishing returns visible after degree 5
+- K-NN averaging with more neighbors smooths predictions but loses accuracy
+
+NOTES:
+=======
+- All calculations used 80/20 train/test split with random_state=42
+- MAPE calculated on non-zero Gibbs energy values only
+- Error bars show ±1 standard deviation of percentage errors
+- 6544 training reference points, 1637 test points used

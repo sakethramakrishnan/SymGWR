@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="700" viewBox="0 0 1100 700">
+<rect x="0" y="0" width="1100" height="700" fill="white"/>
+<text x="550.0" y="42" text-anchor="middle" font-size="28" font-family="Arial">Degree Ablation (fixed neighbors from frozen run)</text>
+<line x1="100" y1="80" x2="100" y2="590" stroke="black" stroke-width="2"/>
+<line x1="100" y1="590" x2="1060" y2="590" stroke="black" stroke-width="2"/>
+<line x1="100" y1="590.00" x2="1060" y2="590.00" stroke="#ececec" stroke-width="1"/>
+<text x="92" y="594.00" text-anchor="end" font-size="12" font-family="Arial">0.0006038</text>
+<line x1="100" y1="488.00" x2="1060" y2="488.00" stroke="#ececec" stroke-width="1"/>
+<text x="92" y="492.00" text-anchor="end" font-size="12" font-family="Arial">0.001981</text>
+<line x1="100" y1="386.00" x2="1060" y2="386.00" stroke="#ececec" stroke-width="1"/>
+<text x="92" y="390.00" text-anchor="end" font-size="12" font-family="Arial">0.003358</text>
+<line x1="100" y1="284.00" x2="1060" y2="284.00" stroke="#ececec" stroke-width="1"/>
+<text x="92" y="288.00" text-anchor="end" font-size="12" font-family="Arial">0.004736</text>
+<line x1="100" y1="182.00" x2="1060" y2="182.00" stroke="#ececec" stroke-width="1"/>
+<text x="92" y="186.00" text-anchor="end" font-size="12" font-family="Arial">0.006113</text>
+<line x1="100" y1="80.00" x2="1060" y2="80.00" stroke="#ececec" stroke-width="1"/>
+<text x="92" y="84.00" text-anchor="end" font-size="12" font-family="Arial">0.00749</text>
+<polyline points="100.00,461.67 237.14,549.78 374.29,553.20 511.43,554.80 648.57,553.92 785.71,554.74 922.86,554.83 1060.00,115.17" fill="none" stroke="#2c7fb8" stroke-width="3"/>
+<circle cx="100.00" cy="461.67" r="4" fill="#2c7fb8"/>
+<circle cx="237.14" cy="549.78" r="4" fill="#2c7fb8"/>
+<circle cx="374.29" cy="553.20" r="4" fill="#2c7fb8"/>
+<circle cx="511.43" cy="554.80" r="4" fill="#2c7fb8"/>
+<circle cx="648.57" cy="553.92" r="4" fill="#2c7fb8"/>
+<circle cx="785.71" cy="554.74" r="4" fill="#2c7fb8"/>
+<circle cx="922.86" cy="554.83" r="4" fill="#2c7fb8"/>
+<circle cx="1060.00" cy="115.17" r="4" fill="#2c7fb8"/>
+<text x="100.00" y="614" text-anchor="middle" font-size="12" font-family="Arial">1</text>
+<text x="237.14" y="614" text-anchor="middle" font-size="12" font-family="Arial">2</text>
+<text x="374.29" y="614" text-anchor="middle" font-size="12" font-family="Arial">3</text>
+<text x="511.43" y="614" text-anchor="middle" font-size="12" font-family="Arial">4</text>
+<text x="648.57" y="614" text-anchor="middle" font-size="12" font-family="Arial">5</text>
+<text x="785.71" y="614" text-anchor="middle" font-size="12" font-family="Arial">6</text>
+<text x="922.86" y="614" text-anchor="middle" font-size="12" font-family="Arial">7</text>
+<text x="1060.00" y="614" text-anchor="middle" font-size="12" font-family="Arial">8</text>
+<text x="580.0" y="678" text-anchor="middle" font-size="14" font-family="Arial">degree</text>
+<text x="36" y="335.0" text-anchor="middle" font-size="14" font-family="Arial" transform="rotate(-90 36,335.0)">GWR MAPE mean</text>
+</svg>

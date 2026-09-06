@@ -1,0 +1,24 @@
+Task 2 summary report
+Measured quantities:
+- Per-iteration queried point and gradient: results/synthetic_loop_stability.csv, columns x*, grad_x*
+- Predicted Gibbs energy trajectory: results/synthetic_loop_stability.csv, column predicted_energy
+- In-domain vs out-of-domain update flag: results/synthetic_loop_stability.csv, column update_in_domain
+- Convergence/divergence labels: results/synthetic_loop_stability.csv, column run_outcome
+- Damping-grid summary: results/synthetic_loop_stability_damping_grid.csv
+Aggregate outcomes:
+- max_iter_no_convergence: count=198, fraction=0.990000
+- max_iter_no_convergence_with_out_of_domain_events: count=2, fraction=0.010000
+- In-domain iteration fraction: 0.996875
+- Total iteration rows: 24000
+- Loop settings: seeds=10, starts=20, max_iter=120
+- Selected damping alpha for primary outputs: 0.01
+- Locked model source convention: trained via run_calphad_repeats-style split 0.6/0.2/0.2, degree=5, k=1.
+- Limitation: synthetic iterative query pattern only (NOT PF-solver integration/validation).
+- Update formula: x_next = clip_to_bbox(x - alpha * step_size * grad / (||grad|| + 1e-12)).
+- Degenerate dimensions frozen in update when bbox width <= 1e-12; count=1.
+- Sign-convention diagnostic: zero-width axis implies any nonzero step in that axis violates bbox regardless of sign; this explains why sign flip is not expected to fix the original 100% out-of-domain result.
+Damping-grid trend:
+- alpha=0.01: in_domain_fraction=0.996875, convergence_rate=0.000000, out_of_domain_update_fraction=0.003125, boundary_projection_fraction=0.003125
+- alpha=0.1: in_domain_fraction=0.905208, convergence_rate=0.000000, out_of_domain_update_fraction=0.094792, boundary_projection_fraction=0.094792
+- alpha=0.5: in_domain_fraction=0.584958, convergence_rate=0.000000, out_of_domain_update_fraction=0.415042, boundary_projection_fraction=0.415042
+- alpha=1: in_domain_fraction=0.309458, convergence_rate=0.000000, out_of_domain_update_fraction=0.690542, boundary_projection_fraction=0.690542

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="700" viewBox="0 0 1100 700">
+<rect x="0" y="0" width="1100" height="700" fill="white"/>
+<text x="550.0" y="42" text-anchor="middle" font-size="28" font-family="Arial">Derivative Evaluation (Proxy Target)</text>
+<line x1="90" y1="80" x2="90" y2="530" stroke="black" stroke-width="2"/>
+<line x1="90" y1="530" x2="1060" y2="530" stroke="black" stroke-width="2"/>
+<line x1="90" y1="530.00" x2="1060" y2="530.00" stroke="#ececec" stroke-width="1"/>
+<text x="82" y="534.00" text-anchor="end" font-size="12" font-family="Arial">0</text>
+<line x1="90" y1="440.00" x2="1060" y2="440.00" stroke="#ececec" stroke-width="1"/>
+<text x="82" y="444.00" text-anchor="end" font-size="12" font-family="Arial">0.01799</text>
+<line x1="90" y1="350.00" x2="1060" y2="350.00" stroke="#ececec" stroke-width="1"/>
+<text x="82" y="354.00" text-anchor="end" font-size="12" font-family="Arial">0.03599</text>
+<line x1="90" y1="260.00" x2="1060" y2="260.00" stroke="#ececec" stroke-width="1"/>
+<text x="82" y="264.00" text-anchor="end" font-size="12" font-family="Arial">0.05398</text>
+<line x1="90" y1="170.00" x2="1060" y2="170.00" stroke="#ececec" stroke-width="1"/>
+<text x="82" y="174.00" text-anchor="end" font-size="12" font-family="Arial">0.07197</text>
+<line x1="90" y1="80.00" x2="1060" y2="80.00" stroke="#ececec" stroke-width="1"/>
+<text x="82" y="84.00" text-anchor="end" font-size="12" font-family="Arial">0.08996</text>
+<rect x="138.50" y="80.00" width="388.00" height="450.00" fill="#2c7fb8"/>
+<text x="332.50" y="548" text-anchor="middle" font-size="11" font-family="Arial" transform="rotate(25 332.50,548)">Derivative MAE</text>
+<rect x="623.50" y="397.70" width="388.00" height="132.30" fill="#2c7fb8"/>
+<text x="817.50" y="548" text-anchor="middle" font-size="11" font-family="Arial" transform="rotate(25 817.50,548)">Derivative MSE</text>
+<text x="30" y="305.0" text-anchor="middle" font-size="14" font-family="Arial" transform="rotate(-90 30,305.0)">Error</text>
+</svg>

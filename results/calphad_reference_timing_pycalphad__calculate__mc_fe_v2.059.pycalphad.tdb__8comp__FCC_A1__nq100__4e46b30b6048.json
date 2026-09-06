@@ -1,0 +1,22 @@
+{
+  "config_id": "calculate__mc_fe_v2.059.pycalphad.tdb__8comp__FCC_A1__nq100__4e46b30b6048",
+  "csv_path": "/home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad__calculate__mc_fe_v2.059.pycalphad.tdb__8comp__FCC_A1__nq100__4e46b30b6048.csv",
+  "meta_path": "/home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad__calculate__mc_fe_v2.059.pycalphad.tdb__8comp__FCC_A1__nq100__4e46b30b6048.json",
+  "cache": "HIT",
+  "source": "/home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad__calculate__mc_fe_v2.059.pycalphad.tdb__8comp__FCC_A1__nq100__4e46b30b6048.csv",
+  "function": "calculate",
+  "phase": "FCC_A1",
+  "phase_reason": "FCC_A1 (austenite) is the substitutional matrix / majority phase for the Fe-Cr-Ni-rich compositions in this query set; single-phase G(X,T) on FCC_A1 is the operation GWR approximates, not multi-phase equilibrium.",
+  "stats_ms": {
+    "mean_ms": 70.48102313999999,
+    "p50_ms": 70.0049925,
+    "p95_ms": 75.28447279999999,
+    "p99_ms": 77.09817160000003,
+    "min_ms": 66.615565,
+    "max_ms": 82.532737
+  },
+  "timed_total_wall_s_approx_from_sum": 7.0481023139999985,
+  "database_load_s": 0.12004017698927782,
+  "n_queries": 100,
+  "stable_csv": "/home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad_calculate.csv"
+}

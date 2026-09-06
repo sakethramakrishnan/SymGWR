@@ -1,0 +1,2 @@
+data_file,target,seed,train_frac,val_frac,test_frac,n_train,n_test,fraction_test_fully_inside_training_bbox,fraction_test_with_any_out_of_range_dimension,n_test_fully_inside_training_bbox,n_test_with_any_out_of_range_dimension,n_dimensions,n_dimensions_with_out_of_range_test_points,out_of_range_dimensions
+data/raw/718_all.csv,Gibbs_energy,0,0.6,0.2,0.2,4908,1637,1.0,0.0,1637,0,8,0,

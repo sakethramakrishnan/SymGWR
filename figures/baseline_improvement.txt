@@ -1,0 +1,4 @@
+Source: results/full_baseline_improvement.csv
+Columns used: model, metric, percent_improvement
+Filter: metric=mape; models=GaussianProcess, LOESS, KNN, KernelRegression
+n: 5 repeats (Issue O/Q exception due GaussianProcess compute cost)

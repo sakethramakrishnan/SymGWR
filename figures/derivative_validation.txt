@@ -1,0 +1,4 @@
+Source: results/derivative_validation_synthetic_v2.csv
+Columns used: function, seed, mean_absolute_error, mean_normalized_error_gradnorm_eps1e-6
+Aggregation: mean over dimension-seed rows per function
+n: 10 seeds (42..51), 70 rows/function

@@ -1,0 +1,2 @@
+mode,locked_convention,canonical_run_id,n_runs_independent_support,n_queries,mean_us,std_us,min_us,p50_us,p95_us,p99_us,max_us,quantiles_monotonic,across_run_mean_of_means_us,across_run_std_of_means_us,across_run_min_of_means_us,across_run_max_of_means_us,sampling,warmup_note
+single_query,single_canonical_run_distribution,1,10,10000,65.3720727,14.061480843965713,49.062,61.075,94.47755,114.9305100000001,184.828,True,66.34695707,5.252285680612992,61.503999,77.1054444,with_replacement_from_test_split_same_run,"quantiles from one warmed canonical run (10,000 queries)"

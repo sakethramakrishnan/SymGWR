@@ -1,0 +1,10 @@
+Convergence diagnostic (alpha=0.01)
+Convergence criterion from experiments/run_synthetic_loop_stability.py: converged if grad_norm < grad_tol (default grad_tol=1e-4) at any iteration.
+Representative sample: 10 runs (seed=0..9, start_id=0), 120 iterations each.
+Median start grad_norm: 1.079784e+00
+Median end grad_norm: 1.080418e+00
+Median |relative end-start change|: 5.579860e-03
+Observed behavior class: plateau_above_threshold
+Gradient norm plateaus above threshold (no approach to 1e-4), indicating stuck/plateau behavior rather than slow convergence.
+Interpretation: normalized-step update has fixed step magnitude (alpha*step_size), so it does not naturally shrink near stationary regions; with projection/boundary interactions this can sustain nonzero gradient norms.
+Evidence files: results/convergence_diagnostic.csv and figures/convergence_diagnostic.png

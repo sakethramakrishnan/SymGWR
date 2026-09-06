@@ -1,0 +1,22 @@
+Source: results/synthetic_loop_stability.csv
+Columns used: seed, start_id, iteration, predicted_energy, grad_norm, update_in_domain, run_outcome
+Figure: figures/synthetic_loop_stability.png
+Locked model config: degree=5, k=1 (trained once at split seed=0 using protocol 0.6/0.2/0.2)
+Selected damping alpha for primary output files: 0.01
+Loop settings: seeds=10, starts_per_seed=20, max_iterations=120
+Limitation: This is a SYNTHETIC iterative query-loop test only. It is NOT a physical PF-solver-in-the-loop validation.
+Domain handling: updates that leave training bounding box are recorded as out-of-domain events; the next point is projected back into the bounding box so subsequent queries remain in-domain.
+Total per-iteration rows recorded: 24000
+In-domain iteration fraction: 0.996875
+Run outcomes:
+- max_iter_no_convergence: 198 runs (0.990000)
+- max_iter_no_convergence_with_out_of_domain_events: 2 runs (0.010000)
+Damping-grid outcomes (all tested, no cherry-picking):
+- alpha=0.01: in_domain_fraction=0.996875, convergence_rate=0.000000, out_of_domain_update_fraction=0.003125
+- alpha=0.1: in_domain_fraction=0.905208, convergence_rate=0.000000, out_of_domain_update_fraction=0.094792
+- alpha=0.5: in_domain_fraction=0.584958, convergence_rate=0.000000, out_of_domain_update_fraction=0.415042
+- alpha=1: in_domain_fraction=0.309458, convergence_rate=0.000000, out_of_domain_update_fraction=0.690542
+Update rule used: normalized gradient-descent style step, x_next = clip_to_bbox(x - alpha * step_size * grad / (||grad|| + 1e-12)). This is damped first-order descent, not Newton-Raphson (no Hessian / second derivative term).
+Degenerate bbox diagnostic: 1 feature dimension(s) had width <= 1e-12 and were frozen during updates to avoid guaranteed out-of-domain jumps from zero-width axes.
+Sign-convention diagnostic: zero-width-axis issue makes any nonzero step in that axis out-of-domain regardless of +/- step sign, so sign flip is not root cause of the original 100% OOD behavior.
+Physical sanity check: no robust physically motivated monotonicity/convexity test was applied, because this synthetic setup does not include PF-solver physics constraints or additional domain assumptions.

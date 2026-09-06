@@ -1,0 +1,17 @@
+Source: results/complexity_scaling.csv
+Columns used: n, method, measurement_type, mean, std, n_repeats
+Split protocol: 0.6/0.2/0.2
+Locked GWR config: degree=5, k=1, relative=False
+Seed convention: 0..4 (n=5)
+Single-query methodology: warmed-up, then 10000 one-by-one queries with replacement
+Maximum train+val pool size under split protocol: 6544
+Runtime convention: n=5 repeats used (instead of n=10) because GP fit includes correlation-matrix construction/inversion and grows sharply with n.
+Methodology reconciliation vs locked timing: this sweep now uses 10,000 single-point queries per (n, seed) cell with explicit warmup and with-replacement sampling from same run's split test pool, matching v2 metadata (`sampling=with_replacement_from_test_split_same_run`).
+Important substitution: GaussianProcess fit time is used as empirical stand-in for GEK-style correlation-matrix cost; this is NOT a direct GEK benchmark.
+Cross-check vs locked v2 reference `results/gwr_timing_detail_v2_locked.csv:mean_us`: ours_at_n=8181=61.135827 us, v2_mean=65.372073 us, delta=-4.236245 us (-6.48%).
+Same-environment self-consistency check against v2 canonical distribution: v2_range=[49.062000, 184.828000] us, v2_p50/p95/p99=[61.075000, 94.477550, 114.930510] us, ours_at_n=8181 within_range=True, within_p50_to_p99=True.
+
+Empirical trend characterization (log-log slope exponent):
+- GWR / fit_time_s: slope ~ 0.173
+- GWR / query_time_s: slope ~ 0.008
+- GaussianProcess / fit_time_s: slope ~ 2.214

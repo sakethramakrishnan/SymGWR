@@ -1,0 +1,7 @@
+Source: results/joint_grid_n10_final.csv
+Columns used: degree, k, seed, split, mape
+Filters: split=val, configs (degree=4,k=2) and (degree=5,k=1), paired by seed
+n: 10 paired seeds; seed sets match exactly: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+Computed means±pop-std: (4,2)=0.0009948425821698 ± 0.0006857816710818099; (5,1)=0.00075812705117366 ± 0.0007288884164460829
+Annotated paired t-test: t=3.4502686358628867, p=0.007271628607374566
+Annotated optional Wilcoxon: W=1.0, p=0.00390625

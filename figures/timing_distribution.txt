@@ -1,0 +1,9 @@
+Source: results/gwr_timing_detail_v2_locked.csv
+Columns used: n_queries, min_us, mean_us, p50_us, p95_us, p99_us, max_us, quantiles_monotonic
+n_queries: 10000
+mean_us: 65.3720727
+p50_us: 61.075
+p95_us: 94.47755
+p99_us: 114.9305100000001
+quantiles_monotonic: True
+Note: locked v2 file is summary-level; figure uses canonical quantile-envelope/CDF markers with dashed vertical lines at mean/p50/p95/p99.

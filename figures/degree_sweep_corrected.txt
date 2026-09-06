@@ -1,0 +1,12 @@
+Source: results/degree_sweep_corrected_n10.csv
+Columns used: degree, k, seed, split, mape
+Filters: k=1, degree=1..15
+n: 10 seeds (0..9)
+Protocol: train MAPE = per-element closed-form polynomial on X_train; test MAPE = full GWR (k=1) on X_test
+degree=1 mean train MAPE (element-wise): 0.19974990594196468
+degree=5: train MAPE=0.00132953708374057, test MAPE=0.00058824468917324
+Lowest mean test MAPE at degree=5
+Callout: test MAPE diverges at degree 8 (24x jump from degree 7)
+Script: experiments/run_corrected_sweeps.py --plot-only (plot_degree_sweep)
+Render: figsize=(3.15, 4.50) in @ 300 dpi = 945 x 1350 px
+Paper: 0.48 textwidth (~3.15 in wide), portrait-ish

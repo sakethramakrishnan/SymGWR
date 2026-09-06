@@ -1,0 +1,2 @@
+derivative_mode,n_repeats,derivative_mae_mean,derivative_mae_std,derivative_mse_mean,derivative_mse_std,limitation_note
+local_finite_difference_proxy,2,0.089963056099257,8.50972667924774e-05,0.0264488356801725,3.723322798052168e-05,No true CALPHAD finite-difference derivatives found; used local finite-difference proxy.

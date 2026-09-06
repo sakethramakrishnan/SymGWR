@@ -1,0 +1,8 @@
+Source: results/k_sweep_corrected_n10.csv
+Columns used: degree, k, seed, split, mape
+Filters: degree=5, k=1..10, split=val, n=10 seeds
+Aggregation: mean +/- std across seeds per k
+Selected point: k=1
+Script: experiments/run_corrected_sweeps.py --plot-only (plot_k_sweep)
+Render: figsize=(6.40, 4.80) in @ 300 dpi = 1920 x 1440 px
+Figure size: matplotlib default (no forced aspect crop)

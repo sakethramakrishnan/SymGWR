@@ -1,0 +1,58 @@
+/home/saketh/Documents/saketh/gwr/.venv_pycalphad/lib/python3.12/site-packages/pycalphad/io/tdb.py:1017: UserWarning: The type definition character `%` was defined in the following phases: ['LIQUID', 'FCC_A1', 'BCC_A2', 'H_BCC', 'BCC_DISL', 'HCP_A3', 'ALPHA_MN', 'BETA_MN', 'BETA_RHOMBO_B', 'DIAMOND_A4', 'GRAPHITE', 'BCC_B2', 'CHI_A12', 'CO3MO', 'CO3V', 'COV3', 'CR3MN5', 'G_PHASE', 'LAVES_PHASE', 'MNNI', 'MNNI2', 'MNNI_T3', 'MU_PHASE', 'MU_PHASE_I', 'ETA', 'NITI2', 'PI_PHASE', 'R_PHASE', 'SIGMA', 'FE17Y2', 'NI5Y', 'PDFE_L12', 'PDMN_AF', 'PDMN_P', 'PDMN_B2', 'PD2MN', 'PD3MN', 'PD5MN3', 'PD6FE5MN2', 'CEMENTITE', 'CR2VC2', 'K_CARB', 'KSI_CARBIDE', 'M3C2', 'M6C', 'M7C3', 'M12C', 'M23C6', 'MOC_ETA', 'V3C2', 'WC', 'EPS_CARB', 'ETA_CARB', 'FE24C10', 'KSI_FE5C2', 'ALN', 'ALN_EQU', 'BN_HP4', 'CR3NI2SIN', 'FE4N', 'MN6N4', 'MN6N5', 'MNSIN2', 'SI3N4', 'ZET', 'CRB', 'CR2B', 'CR5B3', 'FEB', 'FENBB', 'FE3NB3B4', 'M2B', 'MNB2', 'MNB4', 'O_MN2B', 'MN3B4', 'MOB', 'MOB2', 'MO2M1B2', 'NBB', 'NB3B2', 'M5B6', 'TIB', 'TIB2', 'TI3B4', 'A_CHALC', 'ANILITE', 'B_CHALC', 'COVELLITE', 'CU2S', 'DIGENITE', 'DISULF', 'DJURLEITE', 'FC_MONO', 'FC_ORTHO', 'FES_P', 'MNS_Q', 'PYRR', 'TIS', 'TI4C2S2', 'CORUND', 'HALITE', 'HF1O2_M', 'HF1O2_T', 'HF1O2_C', 'LA2O3_A', 'LA2O3_H', 'LA2O3_C', 'SIO2', 'SPINEL', 'TIO2', 'TI2O3', 'TRID', 'Y2O3_C', 'Y2O3_H', 'YALO3', 'Y4AL2O9', 'Y2TIO5', 'Y2TI2O7', 'O1_GAS', 'M2P', 'M3P'], but no corresponding TYPE_DEFINITION line was found in the TDB.
+  warnings.warn(f"The type definition character `{typechar}` was defined in the following phases: "
+========================================================================
+pycalphad CALPHAD equilibrium reference timing
+========================================================================
+TDB path:        /home/saketh/Documents/saketh/gwr/experiments/calphad_ref_data/mc_fe_v2.059.pycalphad.tdb
+TDB source URL:  https://raw.githubusercontent.com/pycalphad/pycalphad/develop/examples/databases/mc_fe_v2.059.pycalphad.tdb
+TDB provenance:  MatCalc mc_fe_v2.059 (E. Povoden-Karadeniz, TU Wien); redistributed in pycalphad examples/databases/
+TDB license:     ODbL 1.0 / DbCL 1.0 (per TDB file header)
+Components:      ['FE', 'CR', 'NI', 'C', 'MN', 'MO', 'SI', 'VA']
+n_query_points:  8
+n_timed_queries: 100
+
+--- environment ---
+CPU:             AMD Ryzen 7 5700U with Radeon Graphics
+OS:              Linux-7.0.0-30-generic-x86_64-with-glibc2.43
+Python:          3.12.14 (/home/saketh/Documents/saketh/gwr/.venv_pycalphad/bin/python)
+pycalphad:       0.11.2
+
+database_load_s: 2.796506
+phases_used:     ['LIQUID', 'FCC_A1', 'BCC_A2', 'HCP_A3', 'CEMENTITE', 'SIGMA', 'M23C6', 'M7C3']
+
+--- warm-up (discarded from timing) ---
+  warmup[0] T=900K X(CR,NI,C,MN,MO,SI)=(0.12,0.08,0.005,0.01,0.005,0.005) wall_s=4.368078 GM=-40293.9
+  warmup[1] T=1000K X(CR,NI,C,MN,MO,SI)=(0.18,0.08,0.01,0.01,0.01,0.005) wall_s=3.782790 GM=-47790.9
+  warmup[2] T=1100K X(CR,NI,C,MN,MO,SI)=(0.18,0.1,0.008,0.015,0.008,0.01) wall_s=3.794676 GM=-56842.4
+  warmup[3] T=1200K X(CR,NI,C,MN,MO,SI)=(0.2,0.12,0.005,0.02,0.01,0.01) wall_s=4.129226 GM=-65532
+  warmup[4] T=1050K X(CR,NI,C,MN,MO,SI)=(0.1,0.2,0.002,0.005,0.002,0.005) wall_s=3.835063 GM=-53643.2
+  warmup[5] T=950K X(CR,NI,C,MN,MO,SI)=(0.15,0.05,0.015,0.02,0.015,0.008) wall_s=4.608520 GM=-44342.6
+  warmup[6] T=1300K X(CR,NI,C,MN,MO,SI)=(0.18,0.08,0.01,0.01,0.01,0.005) wall_s=4.487797 GM=-71614.4
+  warmup[7] T=800K X(CR,NI,C,MN,MO,SI)=(0.12,0.08,0.01,0.01,0.005,0.005) wall_s=4.533434 GM=-33729.7
+
+--- timed queries ---
+  query 1/100 point=0 T=900K dt_ms=4302.428 GM=-40293.9
+  query 10/100 point=1 T=1000K dt_ms=4245.678 GM=-47790.9
+  query 20/100 point=3 T=1200K dt_ms=5999.859 GM=-65532
+  query 30/100 point=5 T=950K dt_ms=5340.534 GM=-44342.6
+  query 40/100 point=7 T=800K dt_ms=5420.441 GM=-33729.7
+  query 50/100 point=1 T=1000K dt_ms=5326.946 GM=-47790.9
+  query 60/100 point=3 T=1200K dt_ms=6391.370 GM=-65532
+  query 70/100 point=5 T=950K dt_ms=4925.530 GM=-44342.6
+  query 80/100 point=7 T=800K dt_ms=5297.883 GM=-33729.7
+  query 90/100 point=1 T=1000K dt_ms=5308.984 GM=-47790.9
+  query 100/100 point=3 T=1200K dt_ms=5893.140 GM=-65532
+
+--- summary ---
+n_timed_queries:     100
+timed_total_wall_s:  530.952655
+database_load_s:     2.796506
+mean_ms:             5309.384102
+p50_ms:              5333.739897
+p95_ms:              6254.277543
+p99_ms:              6518.713481
+min_ms:              3969.733796
+max_ms:              6660.495725
+quantiles_monotonic: True
+csv_written:         /home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad.csv
+csv_rows:            100

@@ -1,0 +1,30 @@
+{
+  "hardware_environment_disclosure": {
+    "cpu_model": "AMD Ryzen 7 5700U with Radeon Graphics",
+    "methodology_note": "Absolute latency is hardware and environment dependent; do not treat as universal.",
+    "numpy_version": "2.5.1",
+    "python_version": "3.14.4",
+    "scipy_version": "1.18.0"
+  },
+  "outputs": {
+    "locked_csv": "results/gwr_timing_detail_v2_locked.csv",
+    "run_summary_csv": "results/gwr_timing_runs_v2.csv"
+  },
+  "parameters": {
+    "data": "data/raw/718_all.csv",
+    "degree": 5,
+    "n_queries": 10000,
+    "n_runs": 10,
+    "n_warmup": 1,
+    "neighbors": 1,
+    "no_scale": false,
+    "query_seed_base": 7000,
+    "random_state": 0,
+    "target": "Gibbs_energy",
+    "test_frac": 0.2,
+    "train_frac": 0.6,
+    "val_frac": 0.2
+  },
+  "python_executable": "/home/saketh/Documents/saketh/gwr/.venv/bin/python",
+  "source_script": "experiments/run_gwr_timing_final_v2.py"
+}

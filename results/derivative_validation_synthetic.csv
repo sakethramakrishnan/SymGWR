@@ -1,0 +1,22 @@
+function,dimension,mean_relative_error,max_relative_error,n_train,n_test,degree,n_neighbors,seed,function_formula,gradient_formula
+f1_quadratic,x1,0.6232725767198388,27.865855900665032,500,100,4,2,42,sum_i x_i^2,2x
+f1_quadratic,x2,0.4350483650380133,9.385140363279845,500,100,4,2,42,sum_i x_i^2,2x
+f1_quadratic,x3,1.9512216739358166,157.64142865208234,500,100,4,2,42,sum_i x_i^2,2x
+f1_quadratic,x4,0.4643514517862848,11.194709144444756,500,100,4,2,42,sum_i x_i^2,2x
+f1_quadratic,x5,0.6088029122323122,30.29657081123164,500,100,4,2,42,sum_i x_i^2,2x
+f1_quadratic,x6,1.4375184130125727,88.63358145539043,500,100,4,2,42,sum_i x_i^2,2x
+f1_quadratic,x7,0.3349478849504389,4.879265604902313,500,100,4,2,42,sum_i x_i^2,2x
+f2_mixed_trig_linear,x1,3.188175329324789,77.48625062430695,500,100,4,2,42,sin(pi*x1) * cos(pi*x2) * x3,"df/dx1=pi*cos(pi*x1)*cos(pi*x2)*x3, df/dx2=-pi*sin(pi*x1)*sin(pi*x2)*x3, df/dx3=sin(pi*x1)*cos(pi*x2), df/dx4..dx7=0"
+f2_mixed_trig_linear,x2,3.385951871917856,89.61785536467846,500,100,4,2,42,sin(pi*x1) * cos(pi*x2) * x3,"df/dx1=pi*cos(pi*x1)*cos(pi*x2)*x3, df/dx2=-pi*sin(pi*x1)*sin(pi*x2)*x3, df/dx3=sin(pi*x1)*cos(pi*x2), df/dx4..dx7=0"
+f2_mixed_trig_linear,x3,1.682088431848494,39.84308253320438,500,100,4,2,42,sin(pi*x1) * cos(pi*x2) * x3,"df/dx1=pi*cos(pi*x1)*cos(pi*x2)*x3, df/dx2=-pi*sin(pi*x1)*sin(pi*x2)*x3, df/dx3=sin(pi*x1)*cos(pi*x2), df/dx4..dx7=0"
+f2_mixed_trig_linear,x4,4646431.899896937,21750376.139963973,500,100,4,2,42,sin(pi*x1) * cos(pi*x2) * x3,"df/dx1=pi*cos(pi*x1)*cos(pi*x2)*x3, df/dx2=-pi*sin(pi*x1)*sin(pi*x2)*x3, df/dx3=sin(pi*x1)*cos(pi*x2), df/dx4..dx7=0"
+f2_mixed_trig_linear,x5,5800884.0745618185,19242590.3879596,500,100,4,2,42,sin(pi*x1) * cos(pi*x2) * x3,"df/dx1=pi*cos(pi*x1)*cos(pi*x2)*x3, df/dx2=-pi*sin(pi*x1)*sin(pi*x2)*x3, df/dx3=sin(pi*x1)*cos(pi*x2), df/dx4..dx7=0"
+f2_mixed_trig_linear,x6,5322647.641322658,33711450.28551334,500,100,4,2,42,sin(pi*x1) * cos(pi*x2) * x3,"df/dx1=pi*cos(pi*x1)*cos(pi*x2)*x3, df/dx2=-pi*sin(pi*x1)*sin(pi*x2)*x3, df/dx3=sin(pi*x1)*cos(pi*x2), df/dx4..dx7=0"
+f2_mixed_trig_linear,x7,5184076.349494617,41739696.12831068,500,100,4,2,42,sin(pi*x1) * cos(pi*x2) * x3,"df/dx1=pi*cos(pi*x1)*cos(pi*x2)*x3, df/dx2=-pi*sin(pi*x1)*sin(pi*x2)*x3, df/dx3=sin(pi*x1)*cos(pi*x2), df/dx4..dx7=0"
+f3_gaussian,x1,0.6619131547330233,10.163115668587729,500,100,4,2,42,exp(-||x||^2),-2x * exp(-||x||^2)
+f3_gaussian,x2,0.778803577281516,32.69410322396361,500,100,4,2,42,exp(-||x||^2),-2x * exp(-||x||^2)
+f3_gaussian,x3,12.218162806127127,1173.314752621398,500,100,4,2,42,exp(-||x||^2),-2x * exp(-||x||^2)
+f3_gaussian,x4,0.5346383078991285,5.0216262290566265,500,100,4,2,42,exp(-||x||^2),-2x * exp(-||x||^2)
+f3_gaussian,x5,1.1815393375925758,29.57432687593192,500,100,4,2,42,exp(-||x||^2),-2x * exp(-||x||^2)
+f3_gaussian,x6,0.5830104907541969,7.352038246920277,500,100,4,2,42,exp(-||x||^2),-2x * exp(-||x||^2)
+f3_gaussian,x7,3.8157597652465234,312.47847857233677,500,100,4,2,42,exp(-||x||^2),-2x * exp(-||x||^2)

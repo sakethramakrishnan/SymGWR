@@ -1,0 +1,12 @@
+Timing variance diagnostic at n=8181
+Protocol: 10 independent process invocations; each run measures 10,000 warmed single queries with replacement from split test pool (seed=0).
+Source table: results/timing_variance_check.csv (columns: run_id, mean_us, std_us)
+Across-run mean of per-run means: 63.313661 us
+Across-run std of per-run means: 3.011690 us
+Across-run min/max of per-run means: 58.644565 / 68.519109 us
+Locked reference mean_us: 48.8086289 us; within spread: False
+Earlier sweep n=8181 mean_us: 59.929590 us; within spread: True
+Conclusion: Independent-run spread does NOT bridge locked and earlier measurements; discrepancy is real under current reproduction and unresolved by noise alone.
+Investigation note: locked file provenance script not directly available; current run matches protocol metadata but cannot confirm byte-identical held-out sample used in locked run.
+Split-sample comparability check: locked row encodes random_state=0, while this task's earlier n=8181 value (59.929590 us) is an average over seeds 0..4, so they are not identical single-split draws.
+Training-pool comparability check: n=8181 cell trains on full 8181-point dataset by construction; locked timing row does not encode training-pool size directly, so exact parity cannot be confirmed.

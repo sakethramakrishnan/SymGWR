@@ -1,0 +1,4 @@
+model_pair,n_excluded,excluded_above,excluded_below,excluded_equal,full_median_delta_mape,mean_signed_distance_from_full_median,mean_abs_distance_from_full_median,mean_signed_distance_div_full_median
+Linear GWR vs Linear Regression,18,16,2,0,0.386757021831762,3.77091192757937e+20,3.77091192757937e+20,9.75008006246284e+20
+Ridge GWR vs Ridge Regression,18,16,2,0,0.386748792751285,3.77085935272943e+20,3.77085935272943e+20,9.7501515800579e+20
+Polynomial GWR vs Polynomial Regression,18,13,5,0,0.10622708844555,7.78349439054967e+19,7.78349439054967e+19,7.327221807966e+20
