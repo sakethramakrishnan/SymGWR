@@ -19,12 +19,12 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from scipy.spatial import cKDTree
-from sklearn.model_selection import train_test_split
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from gwr.core import GradientWeightedRegressor
 from gwr.models import fit_polynomial_regression, model_to_sympy_equation
+from gwr.splits import make_spatial_split as _make_spatial_split
 from gwr.utils import compute_all_metrics, load_dataset, train_val_test_split_df
 
 
@@ -221,60 +221,6 @@ def _gwr_1nn_distances(gwr: GradientWeightedRegressor, X_query: np.ndarray) -> n
         np.asarray(X_query, dtype=np.float64)
     )
     return distances[:, 0]
-
-
-def _make_spatial_split(
-    df_scaled: pd.DataFrame,
-    df_raw: pd.DataFrame,
-    target: str,
-    t_min: int,
-    t_max: int,
-    remain_seed: int,
-    remain_train_frac: float,
-) -> dict[str, Any]:
-    """Hold out contiguous raw Temperature band; split remainder into train/val."""
-    raw_temp = df_raw["Temperature_[K]"].to_numpy()
-    test_mask = (raw_temp >= t_min) & (raw_temp <= t_max)
-    remain_idx = np.where(~test_mask)[0]
-    test_idx = np.where(test_mask)[0]
-
-    X_all = (
-        df_scaled.drop(columns=[target]).select_dtypes(include=[np.number]).values
-    )
-    y_all = df_scaled[target].values
-
-    X_remain, y_remain = X_all[remain_idx], y_all[remain_idx]
-    X_test, y_test = X_all[test_idx], y_all[test_idx]
-
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_remain,
-        y_remain,
-        train_size=remain_train_frac,
-        random_state=remain_seed,
-    )
-    # recover index arrays aligned to original rows for caching
-    # re-split remain_idx the same way via indices
-    rem_train_i, rem_val_i = train_test_split(
-        remain_idx,
-        train_size=remain_train_frac,
-        random_state=remain_seed,
-    )
-    return {
-        "X_train": X_train,
-        "X_val": X_val,
-        "X_test": X_test,
-        "y_train": y_train,
-        "y_val": y_val,
-        "y_test": y_test,
-        "train_idx": np.asarray(rem_train_i, dtype=np.int64),
-        "val_idx": np.asarray(rem_val_i, dtype=np.int64),
-        "test_idx": np.asarray(test_idx, dtype=np.int64),
-        "t_min": t_min,
-        "t_max": t_max,
-        "n_test": int(len(test_idx)),
-        "n_total": int(len(df_scaled)),
-        "test_frac": float(len(test_idx) / len(df_scaled)),
-    }
 
 
 def main() -> None:

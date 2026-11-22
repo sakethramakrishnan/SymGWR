@@ -29,7 +29,10 @@ class CustomStandardScaler:
     def fit(self, X: np.ndarray) -> "CustomStandardScaler":
         self.mean_ = np.mean(X, axis=0)
         self.scale_ = np.std(X, axis=0)
-        self.scale_ = np.where(self.scale_ == 0, 1.0, self.scale_)
+        # Constant columns: np.std of a subset can be ~1e-17 rather than exactly 0
+        # (float rounding in the mean), which would blow noise up to +-1 after scaling.
+        tol = 1e-12 * np.maximum(1.0, np.abs(self.mean_))
+        self.scale_ = np.where(self.scale_ <= tol, 1.0, self.scale_)
         return self
 
     def transform(self, X: np.ndarray) -> np.ndarray:
