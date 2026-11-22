@@ -1,0 +1,162 @@
+[run] split=temp_band models=['SymGWR', 'Linear', 'Ridge', 'Polynomial', 'k-NN', 'Decision tree', 'XGBoost', 'MLP', 'Kernel regression', 'LOESS', 'PINN', 'PySR'] seeds=[42, 43, 44, 45, 46, 47, 48, 49, 50, 51] timeout=900s out=results/camera_ready/baselines_temp_band.csv
+[1/120] split=temp_band model=SymGWR seed=42 status=ok mape_raw=0.0003686 rmse=43.0 r2=1.0000 time=27.3s elapsed=0.5min
+[2/120] split=temp_band model=SymGWR seed=43 status=ok mape_raw=0.0003686 rmse=43.0 r2=1.0000 time=28.5s elapsed=0.9min
+[3/120] split=temp_band model=SymGWR seed=44 status=ok mape_raw=0.0003686 rmse=43.0 r2=1.0000 time=29.0s elapsed=1.4min
+[4/120] split=temp_band model=SymGWR seed=45 status=ok mape_raw=0.0003686 rmse=43.0 r2=1.0000 time=32.3s elapsed=2.0min
+[5/120] split=temp_band model=SymGWR seed=46 status=ok mape_raw=0.0003686 rmse=43.0 r2=1.0000 time=26.7s elapsed=2.4min
+[6/120] split=temp_band model=SymGWR seed=47 status=ok mape_raw=0.0003686 rmse=43.0 r2=1.0000 time=26.4s elapsed=2.8min
+[7/120] split=temp_band model=SymGWR seed=48 status=ok mape_raw=0.0003686 rmse=43.0 r2=1.0000 time=29.9s elapsed=3.3min
+[8/120] split=temp_band model=SymGWR seed=49 status=ok mape_raw=0.0003686 rmse=43.0 r2=1.0000 time=31.9s elapsed=3.9min
+[9/120] split=temp_band model=SymGWR seed=50 status=ok mape_raw=0.0003686 rmse=43.0 r2=1.0000 time=23.2s elapsed=4.3min
+[10/120] split=temp_band model=SymGWR seed=51 status=ok mape_raw=0.0003686 rmse=43.0 r2=1.0000 time=22.0s elapsed=4.6min
+[11/120] split=temp_band model=Linear seed=42 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=1.7s elapsed=4.6min
+[12/120] split=temp_band model=Linear seed=43 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=2.1s elapsed=4.7min
+[13/120] split=temp_band model=Linear seed=44 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=1.8s elapsed=4.7min
+[14/120] split=temp_band model=Linear seed=45 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=1.7s elapsed=4.7min
+[15/120] split=temp_band model=Linear seed=46 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=2.1s elapsed=4.8min
+[16/120] split=temp_band model=Linear seed=47 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=1.9s elapsed=4.8min
+[17/120] split=temp_band model=Linear seed=48 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=2.0s elapsed=4.8min
+[18/120] split=temp_band model=Linear seed=49 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=2.0s elapsed=4.9min
+[19/120] split=temp_band model=Linear seed=50 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=1.9s elapsed=4.9min
+[20/120] split=temp_band model=Linear seed=51 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=1.9s elapsed=4.9min
+[21/120] split=temp_band model=Ridge seed=42 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=2.0s elapsed=5.0min
+[22/120] split=temp_band model=Ridge seed=43 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=1.8s elapsed=5.0min
+[23/120] split=temp_band model=Ridge seed=44 status=ok mape_raw=0.01306 rmse=1394.4 r2=0.9594 time=1.6s elapsed=5.0min
+[24/120] split=temp_band model=Ridge seed=45 status=ok mape_raw=0.01306 rmse=1394.4 r2=0.9594 time=1.4s elapsed=5.0min
+[25/120] split=temp_band model=Ridge seed=46 status=ok mape_raw=0.01306 rmse=1394.4 r2=0.9594 time=1.4s elapsed=5.1min
+[26/120] split=temp_band model=Ridge seed=47 status=ok mape_raw=0.01306 rmse=1394.4 r2=0.9594 time=1.4s elapsed=5.1min
+[27/120] split=temp_band model=Ridge seed=48 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=1.4s elapsed=5.1min
+[28/120] split=temp_band model=Ridge seed=49 status=ok mape_raw=0.01309 rmse=1394.9 r2=0.9594 time=1.5s elapsed=5.1min
+[29/120] split=temp_band model=Ridge seed=50 status=ok mape_raw=0.01306 rmse=1394.3 r2=0.9594 time=1.4s elapsed=5.2min
+[30/120] split=temp_band model=Ridge seed=51 status=ok mape_raw=0.01306 rmse=1394.4 r2=0.9594 time=1.4s elapsed=5.2min
+[31/120] split=temp_band model=Polynomial seed=42 status=ok mape_raw=0.0001201 rmse=17.5 r2=1.0000 time=4.8s elapsed=5.3min
+[32/120] split=temp_band model=Polynomial seed=43 status=ok mape_raw=0.0001201 rmse=17.5 r2=1.0000 time=4.8s elapsed=5.4min
+[33/120] split=temp_band model=Polynomial seed=44 status=ok mape_raw=0.0001201 rmse=17.5 r2=1.0000 time=4.6s elapsed=5.4min
+[34/120] split=temp_band model=Polynomial seed=45 status=ok mape_raw=0.0001201 rmse=17.5 r2=1.0000 time=4.4s elapsed=5.5min
+[35/120] split=temp_band model=Polynomial seed=46 status=ok mape_raw=0.0001201 rmse=17.5 r2=1.0000 time=5.0s elapsed=5.6min
+[36/120] split=temp_band model=Polynomial seed=47 status=ok mape_raw=0.0001201 rmse=17.5 r2=1.0000 time=5.1s elapsed=5.7min
+[37/120] split=temp_band model=Polynomial seed=48 status=ok mape_raw=0.0001201 rmse=17.5 r2=1.0000 time=5.1s elapsed=5.8min
+[38/120] split=temp_band model=Polynomial seed=49 status=ok mape_raw=0.0001201 rmse=17.5 r2=1.0000 time=4.7s elapsed=5.8min
+[39/120] split=temp_band model=Polynomial seed=50 status=ok mape_raw=0.0001201 rmse=17.5 r2=1.0000 time=5.6s elapsed=5.9min
+[40/120] split=temp_band model=Polynomial seed=51 status=ok mape_raw=0.0001201 rmse=17.5 r2=1.0000 time=5.1s elapsed=6.0min
+[41/120] split=temp_band model=k-NN seed=42 status=ok mape_raw=0.04772 rmse=4671.2 r2=0.5442 time=1.6s elapsed=6.0min
+[42/120] split=temp_band model=k-NN seed=43 status=ok mape_raw=0.04773 rmse=4672.5 r2=0.5440 time=1.5s elapsed=6.1min
+[43/120] split=temp_band model=k-NN seed=44 status=ok mape_raw=0.04777 rmse=4675.5 r2=0.5434 time=1.5s elapsed=6.1min
+[44/120] split=temp_band model=k-NN seed=45 status=ok mape_raw=0.04777 rmse=4675.2 r2=0.5435 time=1.5s elapsed=6.1min
+[45/120] split=temp_band model=k-NN seed=46 status=ok mape_raw=0.04777 rmse=4675.2 r2=0.5435 time=1.6s elapsed=6.1min
+[46/120] split=temp_band model=k-NN seed=47 status=ok mape_raw=0.04772 rmse=4671.4 r2=0.5442 time=1.5s elapsed=6.2min
+[47/120] split=temp_band model=k-NN seed=48 status=ok mape_raw=0.04777 rmse=4675.1 r2=0.5435 time=1.9s elapsed=6.2min
+[48/120] split=temp_band model=k-NN seed=49 status=ok mape_raw=0.04777 rmse=4675.6 r2=0.5434 time=1.7s elapsed=6.2min
+[49/120] split=temp_band model=k-NN seed=50 status=ok mape_raw=0.04785 rmse=4682.5 r2=0.5420 time=1.8s elapsed=6.3min
+[50/120] split=temp_band model=k-NN seed=51 status=ok mape_raw=0.04781 rmse=4679.5 r2=0.5426 time=1.7s elapsed=6.3min
+[51/120] split=temp_band model=Decision tree seed=42 status=ok mape_raw=0.04741 rmse=4770.8 r2=0.5246 time=1.5s elapsed=6.3min
+[52/120] split=temp_band model=Decision tree seed=43 status=ok mape_raw=0.04741 rmse=4770.8 r2=0.5246 time=1.5s elapsed=6.3min
+[53/120] split=temp_band model=Decision tree seed=44 status=ok mape_raw=0.04741 rmse=4770.8 r2=0.5246 time=1.5s elapsed=6.4min
+[54/120] split=temp_band model=Decision tree seed=45 status=ok mape_raw=0.04741 rmse=4770.8 r2=0.5246 time=1.5s elapsed=6.4min
+[55/120] split=temp_band model=Decision tree seed=46 status=ok mape_raw=0.04741 rmse=4770.8 r2=0.5246 time=1.5s elapsed=6.4min
+[56/120] split=temp_band model=Decision tree seed=47 status=ok mape_raw=0.04741 rmse=4770.8 r2=0.5246 time=1.4s elapsed=6.4min
+[57/120] split=temp_band model=Decision tree seed=48 status=ok mape_raw=0.04741 rmse=4770.8 r2=0.5246 time=1.4s elapsed=6.5min
+[58/120] split=temp_band model=Decision tree seed=49 status=ok mape_raw=0.04741 rmse=4770.8 r2=0.5246 time=1.5s elapsed=6.5min
+[59/120] split=temp_band model=Decision tree seed=50 status=ok mape_raw=0.04741 rmse=4770.8 r2=0.5246 time=1.5s elapsed=6.5min
+[60/120] split=temp_band model=Decision tree seed=51 status=ok mape_raw=0.04741 rmse=4770.8 r2=0.5246 time=1.5s elapsed=6.5min
+[61/120] split=temp_band model=XGBoost seed=42 status=ok mape_raw=0.08661 rmse=9078.2 r2=-0.7214 time=2.0s elapsed=6.6min
+[62/120] split=temp_band model=XGBoost seed=43 status=ok mape_raw=0.08664 rmse=9079.8 r2=-0.7219 time=1.9s elapsed=6.6min
+[63/120] split=temp_band model=XGBoost seed=44 status=ok mape_raw=0.08663 rmse=9079.7 r2=-0.7219 time=2.0s elapsed=6.6min
+[64/120] split=temp_band model=XGBoost seed=45 status=ok mape_raw=0.08662 rmse=9078.4 r2=-0.7214 time=2.0s elapsed=6.7min
+[65/120] split=temp_band model=XGBoost seed=46 status=ok mape_raw=0.08665 rmse=9081.3 r2=-0.7225 time=2.3s elapsed=6.7min
+[66/120] split=temp_band model=XGBoost seed=47 status=ok mape_raw=0.08668 rmse=9083.2 r2=-0.7233 time=1.9s elapsed=6.7min
+[67/120] split=temp_band model=XGBoost seed=48 status=ok mape_raw=0.0866 rmse=9077.0 r2=-0.7209 time=1.9s elapsed=6.8min
+[68/120] split=temp_band model=XGBoost seed=49 status=ok mape_raw=0.08659 rmse=9076.5 r2=-0.7207 time=2.2s elapsed=6.8min
+[69/120] split=temp_band model=XGBoost seed=50 status=ok mape_raw=0.08664 rmse=9080.3 r2=-0.7221 time=2.3s elapsed=6.8min
+[70/120] split=temp_band model=XGBoost seed=51 status=ok mape_raw=0.0866 rmse=9077.6 r2=-0.7211 time=2.1s elapsed=6.9min
+[71/120] split=temp_band model=MLP seed=42 status=ok mape_raw=0.002119 rmse=247.3 r2=0.9987 time=9.2s elapsed=7.0min
+[72/120] split=temp_band model=MLP seed=43 status=ok mape_raw=0.00236 rmse=267.6 r2=0.9985 time=9.1s elapsed=7.2min
+[73/120] split=temp_band model=MLP seed=44 status=ok mape_raw=0.001995 rmse=224.6 r2=0.9989 time=8.7s elapsed=7.3min
+[74/120] split=temp_band model=MLP seed=45 status=ok mape_raw=0.002329 rmse=269.4 r2=0.9985 time=8.8s elapsed=7.5min
+[75/120] split=temp_band model=MLP seed=46 status=ok mape_raw=0.00225 rmse=255.2 r2=0.9986 time=7.2s elapsed=7.6min
+[76/120] split=temp_band model=MLP seed=47 status=ok mape_raw=0.001999 rmse=221.9 r2=0.9990 time=7.4s elapsed=7.7min
+[77/120] split=temp_band model=MLP seed=48 status=ok mape_raw=0.001775 rmse=211.1 r2=0.9991 time=7.3s elapsed=7.8min
+[78/120] split=temp_band model=MLP seed=49 status=ok mape_raw=0.002165 rmse=263.8 r2=0.9985 time=7.2s elapsed=8.0min
+[79/120] split=temp_band model=MLP seed=50 status=ok mape_raw=0.001767 rmse=203.3 r2=0.9991 time=7.0s elapsed=8.1min
+[80/120] split=temp_band model=MLP seed=51 status=ok mape_raw=0.002447 rmse=291.0 r2=0.9982 time=7.3s elapsed=8.2min
+[81/120] split=temp_band model=Kernel regression seed=42 status=ok mape_raw=0.02773 rmse=2896.5 r2=0.8248 time=2.1s elapsed=8.2min
+[82/120] split=temp_band model=Kernel regression seed=43 status=ok mape_raw=0.02627 rmse=2709.5 r2=0.8467 time=2.1s elapsed=8.3min
+[83/120] split=temp_band model=Kernel regression seed=44 status=ok mape_raw=0.02578 rmse=2682.1 r2=0.8497 time=2.1s elapsed=8.3min
+[84/120] split=temp_band model=Kernel regression seed=45 status=ok mape_raw=0.02761 rmse=2869.2 r2=0.8281 time=2.0s elapsed=8.3min
+[85/120] split=temp_band model=Kernel regression seed=46 status=ok mape_raw=0.02629 rmse=2710.6 r2=0.8465 time=2.1s elapsed=8.4min
+[86/120] split=temp_band model=Kernel regression seed=47 status=ok mape_raw=0.02666 rmse=2748.2 r2=0.8423 time=2.0s elapsed=8.4min
+[87/120] split=temp_band model=Kernel regression seed=48 status=ok mape_raw=0.02746 rmse=2849.4 r2=0.8304 time=2.1s elapsed=8.4min
+[88/120] split=temp_band model=Kernel regression seed=49 status=ok mape_raw=0.02755 rmse=2866.2 r2=0.8284 time=2.1s elapsed=8.5min
+[89/120] split=temp_band model=Kernel regression seed=50 status=ok mape_raw=0.02741 rmse=2841.6 r2=0.8313 time=2.1s elapsed=8.5min
+[90/120] split=temp_band model=Kernel regression seed=51 status=ok mape_raw=0.02657 rmse=2761.4 r2=0.8407 time=2.1s elapsed=8.5min
+[91/120] split=temp_band model=LOESS seed=42 status=ok mape_raw=0.005655 rmse=607.6 r2=0.9923 time=10.0s elapsed=8.7min
+[92/120] split=temp_band model=LOESS seed=43 status=ok mape_raw=0.005617 rmse=602.4 r2=0.9924 time=10.1s elapsed=8.9min
+[93/120] split=temp_band model=LOESS seed=44 status=ok mape_raw=0.005571 rmse=599.4 r2=0.9925 time=10.2s elapsed=9.0min
+[94/120] split=temp_band model=LOESS seed=45 status=ok mape_raw=0.005778 rmse=615.4 r2=0.9921 time=9.6s elapsed=9.2min
+[95/120] split=temp_band model=LOESS seed=46 status=ok mape_raw=0.005642 rmse=605.7 r2=0.9923 time=9.7s elapsed=9.4min
+[96/120] split=temp_band model=LOESS seed=47 status=ok mape_raw=0.005596 rmse=601.4 r2=0.9924 time=10.0s elapsed=9.5min
+[97/120] split=temp_band model=LOESS seed=48 status=ok mape_raw=0.005703 rmse=610.4 r2=0.9922 time=9.9s elapsed=9.7min
+[98/120] split=temp_band model=LOESS seed=49 status=ok mape_raw=0.005687 rmse=613.3 r2=0.9921 time=10.2s elapsed=9.9min
+[99/120] split=temp_band model=LOESS seed=50 status=ok mape_raw=0.005595 rmse=603.0 r2=0.9924 time=9.9s elapsed=10.0min
+[100/120] split=temp_band model=LOESS seed=51 status=ok mape_raw=0.005768 rmse=622.0 r2=0.9919 time=10.2s elapsed=10.2min
+[101/120] split=temp_band model=PINN seed=42 status=ok mape_raw=0.00181 rmse=211.5 r2=0.9991 time=33.9s elapsed=10.8min
+[102/120] split=temp_band model=PINN seed=43 status=ok mape_raw=0.001352 rmse=160.0 r2=0.9995 time=32.2s elapsed=11.3min
+[103/120] split=temp_band model=PINN seed=44 status=ok mape_raw=0.00295 rmse=316.0 r2=0.9979 time=34.0s elapsed=11.9min
+[104/120] split=temp_band model=PINN seed=45 status=ok mape_raw=0.002347 rmse=266.3 r2=0.9985 time=38.3s elapsed=12.5min
+[105/120] split=temp_band model=PINN seed=46 status=ok mape_raw=0.001822 rmse=212.2 r2=0.9991 time=40.1s elapsed=13.2min
+[106/120] split=temp_band model=PINN seed=47 status=ok mape_raw=0.001317 rmse=151.7 r2=0.9995 time=40.0s elapsed=13.8min
+[107/120] split=temp_band model=PINN seed=48 status=ok mape_raw=0.001866 rmse=216.6 r2=0.9990 time=27.0s elapsed=14.3min
+[108/120] split=temp_band model=PINN seed=49 status=ok mape_raw=0.00701 rmse=722.0 r2=0.9891 time=29.1s elapsed=14.8min
+[109/120] split=temp_band model=PINN seed=50 status=ok mape_raw=0.001886 rmse=211.1 r2=0.9991 time=31.5s elapsed=15.3min
+[110/120] split=temp_band model=PINN seed=51 status=ok mape_raw=0.003527 rmse=384.3 r2=0.9969 time=32.0s elapsed=15.8min
+[111/120] split=temp_band model=PySR seed=42 status=ok mape_raw=0.01135 rmse=1199.0 r2=0.9700 time=25.9s elapsed=16.3min
+[112/120] split=temp_band model=PySR seed=43 status=ok mape_raw=0.01415 rmse=1496.9 r2=0.9532 time=24.5s elapsed=16.7min
+[113/120] split=temp_band model=PySR seed=44 status=ok mape_raw=0.01134 rmse=1257.5 r2=0.9670 time=24.9s elapsed=17.1min
+[114/120] split=temp_band model=PySR seed=45 status=ok mape_raw=0.01327 rmse=1444.5 r2=0.9564 time=24.3s elapsed=17.5min
+[115/120] split=temp_band model=PySR seed=46 status=ok mape_raw=0.01055 rmse=1091.3 r2=0.9751 time=24.5s elapsed=17.9min
+[116/120] split=temp_band model=PySR seed=47 status=ok mape_raw=0.01335 rmse=1436.5 r2=0.9569 time=25.1s elapsed=18.3min
+[117/120] split=temp_band model=PySR seed=48 status=ok mape_raw=0.01725 rmse=1775.8 r2=0.9341 time=24.5s elapsed=18.7min
+[118/120] split=temp_band model=PySR seed=49 status=ok mape_raw=0.01194 rmse=1319.8 r2=0.9636 time=24.4s elapsed=19.1min
+[119/120] split=temp_band model=PySR seed=50 status=ok mape_raw=0.009516 rmse=943.2 r2=0.9814 time=24.4s elapsed=19.5min
+[120/120] split=temp_band model=PySR seed=51 status=ok mape_raw=0.01093 rmse=1112.2 r2=0.9742 time=24.2s elapsed=20.0min
+[done] split=temp_band wall=20.0min -> results/camera_ready/baselines_temp_band.csv, results/camera_ready/baselines_temp_band_summary.csv
+                model  n_seeds_ok  n_timeout  mape_raw_mean  mape_raw_std    rmse_mean   r2_mean symgwr_wins_of_total     p_paired_t  p_wilcoxon
+0              SymGWR          10          0       0.000369  1.773921e-15    43.005845  0.999961                                 NaN         NaN
+1              Linear          10          0       0.013058  1.197950e-16  1394.292607  0.959395                10/10  2.483397e-117    0.001953
+2               Ridge          10          0       0.013063  1.010429e-05  1394.389031  0.959390                10/10   2.064561e-29    0.001953
+3          Polynomial          10          0       0.000120  4.531139e-15    17.453818  0.999994                 0/10   1.987004e-97    0.001953
+4                k-NN          10          0       0.047767  3.769436e-05  4675.373319  0.543435                10/10   2.048721e-29    0.001953
+5       Decision tree          10          0       0.047410  7.314236e-18  4770.832501  0.524602                10/10  2.481635e-122    0.001953
+6             XGBoost          10          0       0.086626  2.693884e-05  9079.198952 -0.721728                10/10   4.550860e-33    0.001953
+7                 MLP          10          0       0.002121  2.360821e-04   245.522455  0.998725                10/10   2.207833e-09    0.001953
+8   Kernel regression          10          0       0.026934  6.974722e-04  2793.474931  0.836893                10/10   9.520704e-16    0.001953
+9               LOESS          10          0       0.005661  7.195919e-05   608.054832  0.992277                10/10   2.554230e-18    0.001953
+10               PINN          10          0       0.002589  1.698765e-03   285.175279  0.997766                10/10   2.548245e-03    0.001953
+11               PySR          10          0       0.012365  2.225897e-03  1307.680461  0.963192                10/10   3.705076e-08    0.001953
+[run] split=temp_band models=['GP'] seeds=[42, 43, 44, 45, 46, 47, 48, 49, 50, 51] timeout=900s out=results/camera_ready/baselines_temp_band.csv
+[1/10] split=temp_band model=GP seed=42 status=ok mape_raw=5.767e-05 rmse=8.4 r2=1.0000 time=266.1s elapsed=4.4min
+[2/10] split=temp_band model=GP seed=43 status=ok mape_raw=5.888e-05 rmse=8.4 r2=1.0000 time=194.3s elapsed=7.7min
+[3/10] split=temp_band model=GP seed=44 status=ok mape_raw=5.839e-05 rmse=8.4 r2=1.0000 time=156.3s elapsed=10.3min
+[4/10] split=temp_band model=GP seed=45 status=ok mape_raw=5.947e-05 rmse=8.5 r2=1.0000 time=166.5s elapsed=13.1min
+[5/10] split=temp_band model=GP seed=46 status=ok mape_raw=5.858e-05 rmse=8.3 r2=1.0000 time=229.8s elapsed=16.9min
+[6/10] split=temp_band model=GP seed=47 status=ok mape_raw=5.919e-05 rmse=8.5 r2=1.0000 time=233.1s elapsed=20.8min
+[7/10] split=temp_band model=GP seed=48 status=ok mape_raw=5.794e-05 rmse=8.6 r2=1.0000 time=134.1s elapsed=23.0min
+[8/10] split=temp_band model=GP seed=49 status=ok mape_raw=5.738e-05 rmse=8.3 r2=1.0000 time=179.5s elapsed=26.0min
+[9/10] split=temp_band model=GP seed=50 status=ok mape_raw=5.906e-05 rmse=8.5 r2=1.0000 time=211.9s elapsed=29.5min
+[10/10] split=temp_band model=GP seed=51 status=ok mape_raw=5.792e-05 rmse=8.3 r2=1.0000 time=202.4s elapsed=32.9min
+[done] split=temp_band wall=32.9min -> results/camera_ready/baselines_temp_band.csv, results/camera_ready/baselines_temp_band_summary.csv
+                model  n_seeds_ok  n_timeout  mape_raw_mean  mape_raw_std    rmse_mean   r2_mean symgwr_wins_of_total     p_paired_t  p_wilcoxon
+0              SymGWR          10          0       0.000369  1.773921e-15    43.005845  0.999961                                 NaN         NaN
+1              Linear          10          0       0.013058  1.197950e-16  1394.292607  0.959395                10/10  2.483397e-117    0.001953
+2               Ridge          10          0       0.013063  1.010429e-05  1394.389031  0.959390                10/10   2.064561e-29    0.001953
+3          Polynomial          10          0       0.000120  4.531139e-15    17.453818  0.999994                 0/10   1.987004e-97    0.001953
+4                k-NN          10          0       0.047767  3.769436e-05  4675.373319  0.543435                10/10   2.048721e-29    0.001953
+5       Decision tree          10          0       0.047410  7.314236e-18  4770.832501  0.524602                10/10  2.481635e-122    0.001953
+6             XGBoost          10          0       0.086626  2.693884e-05  9079.198952 -0.721728                10/10   4.550860e-33    0.001953
+7                 MLP          10          0       0.002121  2.360821e-04   245.522455  0.998725                10/10   2.207833e-09    0.001953
+8   Kernel regression          10          0       0.026934  6.974722e-04  2793.474931  0.836893                10/10   9.520704e-16    0.001953
+9               LOESS          10          0       0.005661  7.195919e-05   608.054832  0.992277                10/10   2.554230e-18    0.001953
+10               PINN          10          0       0.002589  1.698765e-03   285.175279  0.997766                10/10   2.548245e-03    0.001953
+11                 GP          10          0       0.000058  7.031886e-07     8.416907  0.999999                 0/10   2.545558e-25    0.001953
+12               PySR          10          0       0.012365  2.225897e-03  1307.680461  0.963192                10/10   3.705076e-08    0.001953
+ALL_DONE
