@@ -10,7 +10,10 @@ Test accuracy on the three CALPHAD splits: mean ± std over seeds (std with ddof
 |:--|--:|--:|--:|:--|
 | **Random split: 10 effective independent partitions (i)** |  |  |  |  |
 | SymGWR-T | 2.25 ± 0.15 | (2.06 ± 0.07)×10⁻³ | (9.83 ± 1.36)×10⁻⁹ |  |
-| SymGWR-R | **1.16 ± 0.10** | **(7.20 ± 0.39)×10⁻⁴** | **(2.61 ± 0.44)×10⁻⁹** |  |
+| SymGWR-R | 1.16 ± 0.10 | (7.20 ± 0.39)×10⁻⁴ | (2.61 ± 0.44)×10⁻⁹ |  |
+| SymGWR-R-IDW (k=4) | 1.39 ± 0.81 | (4.52 ± 1.15)×10⁻⁴ | (4.88 ± 5.58)×10⁻⁹ |  |
+| SymGWR-R-CS (k=4) | 1.01 ± 0.49 | (3.97 ± 0.66)×10⁻⁴ | (2.38 ± 2.58)×10⁻⁹ |  |
+| Cubic along T / arm | **0.800 ± 0.448** | **(1.74 ± 0.21)×10⁻⁴** | **(1.61 ± 2.21)×10⁻⁹** |  |
 | Linear | 1292 ± 19 | 1.09 ± 0.02 | (3.24 ± 0.10)×10⁻³ |  |
 | Ridge | 1293 ± 19 | 1.09 ± 0.02 | (3.24 ± 0.10)×10⁻³ |  |
 | Polynomial | 18.1 ± 0.9 | 0.0124 ± 0.0002 | (6.37 ± 0.53)×10⁻⁷ |  |
@@ -18,14 +21,17 @@ Test accuracy on the three CALPHAD splits: mean ± std over seeds (std with ddof
 | Decision tree | 590 ± 31 | 0.428 ± 0.015 | (6.77 ± 0.74)×10⁻⁴ |  |
 | XGBoost | 154 ± 8 | 0.103 ± 0.007 | (4.60 ± 0.55)×10⁻⁵ |  |
 | MLP | 129 ± 17 | 0.108 ± 0.013 | (3.29 ± 0.89)×10⁻⁵ |  |
-| Kernel regression | 3517 ± 103 | 2.98 ± 0.11 | 0.0240 ± 0.0009 | a |
-| LOESS | 425 ± 11 | 0.356 ± 0.009 | (3.51 ± 0.17)×10⁻⁴ | a |
-| PINN | 223 ± 134 | 0.208 ± 0.156 | (1.28 ± 1.69)×10⁻⁴ | b |
+| Kernel regression | 3517 ± 103 | 2.98 ± 0.11 | 0.0240 ± 0.0009 | b |
+| LOESS | 425 ± 11 | 0.356 ± 0.009 | (3.51 ± 0.17)×10⁻⁴ | b |
+| PINN | 223 ± 134 | 0.208 ± 0.156 | (1.28 ± 1.69)×10⁻⁴ | c |
+| GP | 8.40 ± 0.45 | (5.88 ± 0.23)×10⁻³ | (1.37 ± 0.13)×10⁻⁷ | d |
 | PySR | 1219 ± 159 | 1.10 ± 0.15 | (2.93 ± 0.79)×10⁻³ |  |
-| GP | — | — | — |  |
 | **Temp.-band split: 1 effective independent partition (ii)** |  |  |  |  |
 | SymGWR-T | 43.0 ± 0 | 0.0369 ± 0 | 3.86×10⁻⁵ ± 0 |  |
-| SymGWR-R | **2.24 ± 0** | **1.54×10⁻³ ± 0** | **1.04×10⁻⁷ ± 0** |  |
+| SymGWR-R | 2.24 ± 0 | 1.54×10⁻³ ± 0 | 1.04×10⁻⁷ ± 0 |  |
+| SymGWR-R-IDW (k=4) | 5.46 ± 0.04 | (2.42 ± 0.03)×10⁻³ | (6.23 ± 0.09)×10⁻⁷ |  |
+| SymGWR-R-CS (k=4) | 3.65 ± 0.06 | (1.90 ± 0.01)×10⁻³ | (2.78 ± 0.09)×10⁻⁷ |  |
+| Cubic along T / arm | **0.553 ± 0** | **2.65×10⁻⁴ ± 0** | **6.38×10⁻⁹ ± 0** |  |
 | Linear | 1394 ± 0 | 1.31 ± 0 | 0.0406 ± 0 |  |
 | Ridge | 1394 ± 0.20 | 1.31 ± 1.0×10⁻³ | 0.0406 ± 1.2×10⁻⁵ |  |
 | Polynomial | 17.5 ± 0 | 0.0120 ± 0 | 6.36×10⁻⁶ ± 0 |  |
@@ -33,14 +39,17 @@ Test accuracy on the three CALPHAD splits: mean ± std over seeds (std with ddof
 | Decision tree | 4771 ± 0 | 4.74 ± 0 | 0.475 ± 0 |  |
 | XGBoost | 9079 ± 2 | 8.66 ± 2.7×10⁻³ | 1.72 ± 7.8×10⁻⁴ |  |
 | MLP | 246 ± 29 | 0.212 ± 0.024 | (1.27 ± 0.30)×10⁻³ |  |
-| Kernel regression | 2793 ± 79 | 2.69 ± 0.07 | 0.163 ± 0.009 | a |
-| LOESS | 608 ± 7 | 0.566 ± 0.007 | (7.72 ± 0.18)×10⁻³ | a |
-| PINN | 285 ± 169 | 0.259 ± 0.170 | (2.23 ± 3.14)×10⁻³ | b |
+| Kernel regression | 2793 ± 79 | 2.69 ± 0.07 | 0.163 ± 0.009 | b |
+| LOESS | 608 ± 7 | 0.566 ± 0.007 | (7.72 ± 0.18)×10⁻³ | b |
+| PINN | 285 ± 169 | 0.259 ± 0.170 | (2.23 ± 3.14)×10⁻³ | c |
+| GP | 8.42 ± 0.10 | (5.84 ± 0.07)×10⁻³ | (1.48 ± 0.04)×10⁻⁶ | d |
 | PySR | 1308 ± 241 | 1.24 ± 0.22 | 0.0368 ± 0.0137 |  |
-| GP | 8.42 ± 0.10 | (5.84 ± 0.07)×10⁻³ | (1.48 ± 0.04)×10⁻⁶ | c |
 | **Comp.-group split: 5 effective independent partitions (iii)** |  |  |  |  |
 | SymGWR-T | 124 ± 98 | 0.0630 ± 0.0336 | (4.72 ± 8.79)×10⁻⁵ |  |
-| SymGWR-R | 60.0 ± 64.3 | **0.0322 ± 0.0293** | (1.44 ± 3.14)×10⁻⁵ |  |
+| SymGWR-R | 60.0 ± 64.3 | 0.0322 ± 0.0293 | (1.44 ± 3.14)×10⁻⁵ |  |
+| SymGWR-R-IDW (k=4) | 59.6 ± 64.4 | 0.0310 ± 0.0293 | (1.44 ± 3.14)×10⁻⁵ |  |
+| SymGWR-R-CS (k=4) | 59.6 ± 64.4 | **0.0304 ± 0.0293** | (1.44 ± 3.14)×10⁻⁵ |  |
+| Cubic along T / arm | 3.34 ± 2.36 | (1.47 ± 0.90)×10⁻³ | (3.16 ± 4.29)×10⁻⁸ | a |
 | Linear | 1331 ± 219 | 1.14 ± 0.12 | (3.49 ± 1.08)×10⁻³ |  |
 | Ridge | 1352 ± 206 | 1.15 ± 0.12 | (3.59 ± 1.04)×10⁻³ |  |
 | Polynomial | **53.3 ± 17.9** | 0.0380 ± 0.0109 | **(6.06 ± 4.06)×10⁻⁶** |  |
@@ -48,20 +57,22 @@ Test accuracy on the three CALPHAD splits: mean ± std over seeds (std with ddof
 | Decision tree | 704 ± 260 | 0.490 ± 0.157 | (1.08 ± 0.85)×10⁻³ |  |
 | XGBoost | 928 ± 423 | 0.611 ± 0.215 | (1.99 ± 2.16)×10⁻³ |  |
 | MLP | 324 ± 285 | 0.226 ± 0.120 | (3.53 ± 7.58)×10⁻⁴ |  |
-| Kernel regression | 3505 ± 96 | 2.97 ± 0.12 | 0.0238 ± 0.0016 | a |
-| LOESS | 1087 ± 1746 | 0.652 ± 0.701 | (7.83 ± 22.97)×10⁻³ | a |
-| PINN | 309 ± 218 | 0.239 ± 0.146 | (2.72 ± 4.23)×10⁻⁴ | b |
+| Kernel regression | 3505 ± 96 | 2.97 ± 0.12 | 0.0238 ± 0.0016 | b |
+| LOESS | 1087 ± 1746 | 0.652 ± 0.701 | (7.83 ± 22.97)×10⁻³ | b |
+| PINN | 309 ± 218 | 0.239 ± 0.146 | (2.72 ± 4.23)×10⁻⁴ | c |
+| GP | 84.0 ± 106.8 | 0.0461 ± 0.0306 | (3.27 ± 8.62)×10⁻⁵ | d |
 | PySR | 1288 ± 200 | 1.12 ± 0.10 | (3.27 ± 1.06)×10⁻³ |  |
-| GP | — | — | — |  |
 
 - "± 0": std below 1e-08 of the mean (numerical noise; fixed test set and deterministic fit), not exactly zero.
 - SymGWR-T = degree-5 polynomial + k=1 nearest-reference Taylor surrogate (`SymGWR` in the CSVs); SymGWR-R = residual-anchored variant (`residual_anchored`, from taylor_variants_accuracy_per_seed.csv).
+- SymGWR-R-IDW / SymGWR-R-CS (k=4) = residual-anchored polynomial plus an inverse-distance / compactly supported blend of the k nearest reference residuals (ridwcs_accuracy_per_seed.csv); the cubic row is a cubic interpolant along T (random, temp.-band) or along the composition arm (comp.-group) through the reference rows (interp_baselines_per_seed.csv).
 - (i) Random: 10 random 60/20/20 resamples; test sets overlap, pairs not strictly independent
 - (ii) Temp.-band: test set fixed (1,568 rows, same for every seed); only train/val partition varies
 - (iii) Comp.-group: 5 folds x 2 shuffles: test fold = seed % 5, so 5 distinct test sets, each seen twice
-- (a) train rows capped at 2500 (random subsample, seed-dependent); val rows added on refit
-- (b) temperature column moved to index 0 before train_pinn: the library physics loss penalises dG/d(feature 0), and feature 0 in the data is Mass_fraction_Nb
-- (c) GP protocol: alpha tuned on a 1000-row train subsample (val MSE), then ONE refit on train (capped 2500) + val; 25 min timeout
+- (a) Comp.-group: cubic along the composition arm is defined for only 81% of the test rows (composition bracketed by reference compositions on its arm; star-centre and out-of-range rows have no value). Its metrics are on those rows only, where SymGWR-T has MAPE 0.0434% (all rows: 0.0630%); it is therefore excluded from the bold best-of ranking in this split.
+- (b) train rows capped at 2500 (random subsample, seed-dependent); val rows added on refit
+- (c) temperature column moved to index 0 before train_pinn: the library physics loss penalises dG/d(feature 0), and feature 0 in the data is Mass_fraction_Nb
+- (d) GP protocol: alpha tuned on a 1000-row train subsample (val MSE), then ONE refit on train (capped 2500) + val; 25 min timeout
 - Seeds per method: 10; timeouts: 0, errors: 0.
 
 ### Table 2. Derivative fidelity of the degree-5 SymGWR polynomial vs. central finite differences
@@ -86,24 +97,39 @@ Analytic polynomial gradient vs. central finite differences of the raw CALPHAD t
 
 ### Table 3. Continuity of the nearest-reference surrogates on short segments
 
-Jump of the surrogate across nearest-reference switches on 5,000 short segments per seed (10 seeds). Short segments start at a test query and have length 0.1–1.0× the nearest-reference distance. Value jump in J/mol; gradient jump relative to the median model gradient norm. Median and p95 are averaged over seeds; max is the maximum over seeds.
+Jump of the surrogate across reference-change events on 5,000 short segments per split and seed (10 seeds). Short segments start at a test query and have length 0.1–1.0× the nearest-reference distance. Value jump in J/mol; gradient jump relative to the median model gradient norm. Median and p95 are averaged over seeds; max is the maximum over seeds.
 
 |  |  |  | Value jump (J/mol) |  |  | Gradient jump (rel.) |  |  |
 |:--|:--|--:|--:|--:|--:|--:|--:|--:|
-| **Split** | **Variant** | **Switches** | **Median** | **p95** | **Max** | **Median** | **p95** | **Max** |
-| Random | SymGWR-T | 16,560 | 0.480 | 4.92 | 156 | 0.0248 | 0.0598 | 0.206 |
-| Random | SymGWR-R | 16,560 | 0.477 | 3.96 | 145 | 6.17×10⁻¹⁷ | 2.45×10⁻¹⁶ | 8.50×10⁻¹⁶ |
-| Random | SymGWR-R-IDW | not available | — | — | — | — | — | — |
-| Temp.-band | SymGWR-T | 4,904 | 58.4 | 422 | 2351 | 0.123 | 0.407 | 0.525 |
-| Temp.-band | SymGWR-R | 4,904 | 3.59 | 24.5 | 136 | 1.42×10⁻¹⁷ | 2.04×10⁻¹⁶ | 5.27×10⁻¹⁶ |
-| Temp.-band | SymGWR-R-IDW | not available | — | — | — | — | — | — |
-| Comp.-group | SymGWR-T | 97,498 | 9.32 | 190 | 12344 | 0.0134 | 0.150 | 6.34 |
-| Comp.-group | SymGWR-R | 97,498 | 0.366 | 19.5 | 188 | 7.83×10⁻¹⁷ | 3.27×10⁻¹⁶ | 1.09×10⁻¹⁴ |
-| Comp.-group | SymGWR-R-IDW | not available | — | — | — | — | — | — |
+| **Variant** | **Event** | **Events** | **Median** | **p95** | **Max** | **Median** | **p95** | **Max** |
+| **Random split** |  |  |  |  |  |  |  |  |
+| SymGWR-T | NN switch | 16,560 | 0.480 | 4.92 | 156 | 0.0248 | 0.0598 | 0.206 |
+| SymGWR-R | NN switch | 16,560 | 0.477 | 3.96 | 145 | 6.17×10⁻¹⁷ | 2.45×10⁻¹⁶ | 8.50×10⁻¹⁶ |
+| SymGWR-R-IDW (k=4) | NN switch | 16,601 | 4.51×10⁻¹² | 0.0809 | 2.25 | 7.61×10⁻¹⁷ | 1.74×10⁻⁵ | 8.01×10⁻³ |
+| SymGWR-R-IDW (k=4) | k-set | 9,343 | 0.0417 | 0.735 | 28.7 | 2.32×10⁻⁵ | 7.54×10⁻⁴ | 0.0176 |
+| SymGWR-R-CS (k=4) | NN switch | 16,738 | 2.53×10⁻¹² | 1.01×10⁻¹¹ | 4.06×10⁻¹¹ | 3.75×10⁻⁷ | 9.19×10⁻⁵ | 0.0195 |
+| SymGWR-R-CS (k=4) | k-set | 9,274 | 2.30×10⁻¹² | 1.01×10⁻¹¹ | 4.06×10⁻¹¹ | 5.72×10⁻⁵ | 7.94×10⁻⁴ | 0.184 |
+| SymGWR-R-CS (k=4) | support | 15,642 | 2.46×10⁻¹² | 1.01×10⁻¹¹ | 4.06×10⁻¹¹ | 7.05×10⁻⁶ | 2.39×10⁻⁴ | 0.0746 |
+| **Temp.-band split** |  |  |  |  |  |  |  |  |
+| SymGWR-T | NN switch | 4,904 | 58.4 | 422 | 2351 | 0.123 | 0.407 | 0.525 |
+| SymGWR-R | NN switch | 4,904 | 3.59 | 24.5 | 136 | 1.42×10⁻¹⁷ | 2.04×10⁻¹⁶ | 5.27×10⁻¹⁶ |
+| SymGWR-R-IDW (k=4) | NN switch | 4,912 | 9.83×10⁻¹⁵ | 2.41×10⁻¹² | 29.1 | 1.45×10⁻¹⁷ | 2.00×10⁻¹⁶ | 7.31×10⁻³ |
+| SymGWR-R-IDW (k=4) | k-set | 33,072 | 0.673 | 9.81 | 31.9 | 1.35×10⁻⁴ | 1.47×10⁻³ | 8.72×10⁻³ |
+| SymGWR-R-CS (k=4) | NN switch | 4,802 | 1.74×10⁻¹⁴ | 2.17×10⁻¹² | 2.52×10⁻¹¹ | 2.56×10⁻⁶ | 1.28×10⁻³ | 0.159 |
+| SymGWR-R-CS (k=4) | k-set | 33,175 | 2.42×10⁻¹³ | 2.79×10⁻¹² | 1.40×10⁻¹¹ | 4.98×10⁻⁴ | 8.43×10⁻³ | 0.318 |
+| SymGWR-R-CS (k=4) | support | 49,172 | 1.70×10⁻¹³ | 2.79×10⁻¹² | 1.40×10⁻¹¹ | 3.99×10⁻⁵ | 3.37×10⁻³ | 0.259 |
+| **Comp.-group split** |  |  |  |  |  |  |  |  |
+| SymGWR-T | NN switch | 97,498 | 9.32 | 190 | 12344 | 0.0134 | 0.150 | 6.34 |
+| SymGWR-R | NN switch | 97,498 | 0.366 | 19.5 | 188 | 7.83×10⁻¹⁷ | 3.27×10⁻¹⁶ | 1.09×10⁻¹⁴ |
+| SymGWR-R-IDW (k=4) | NN switch | 50,000 | 2.71×10⁻¹² | 3.21 | 46.2 | 9.30×10⁻¹⁷ | 4.68×10⁻⁵ | 4.23×10⁻³ |
+| SymGWR-R-IDW (k=4) | k-set | 50,000 | 0.466 | 12.8 | 46.3 | 1.19×10⁻⁵ | 1.69×10⁻³ | 0.0218 |
+| SymGWR-R-CS (k=4) | NN switch | 50,000 | 2.08×10⁻¹² | 1.21×10⁻¹¹ | 1.16×10⁻¹⁰ | 1.62×10⁻¹⁶ | 0.0289 | 1.50 |
+| SymGWR-R-CS (k=4) | k-set | 50,000 | 2.01×10⁻¹² | 1.23×10⁻¹¹ | 1.49×10⁻¹⁰ | 6.91×10⁻⁴ | 0.140 | 13.0 |
+| SymGWR-R-CS (k=4) | support | 50,000 | 1.73×10⁻¹² | 1.11×10⁻¹¹ | 1.19×10⁻¹⁰ | 1.16×10⁻⁵ | 0.0375 | 13.0 |
 
 - SymGWR-T extrapolates linearly from the nearest reference, so value and gradient both jump at cell boundaries. SymGWR-R adds a constant offset to the polynomial P, so its gradient (grad P) is continuous (jumps are zero up to rounding) and only the value jumps.
-- Not available: SymGWR-R-IDW is not a variant in continuity_summary.csv (run_continuity_audit.py currently covers SymGWR-T, SymGWR-R only).
-- Switches = nearest-reference switches located by bisection and evaluated on both sides, summed over seeds; tie-plane switches excluded: 0.
+- SymGWR-R-IDW / -CS blend the residuals of the k=4 nearest references. Event: NN switch = the nearest reference changes; k-set = the set of the k nearest references changes (k-th and (k+1)-th reference swap); support (CS only) = the (k+1)-th reference changes with the k-set unchanged, which moves the support radius. The NN-switch rows of the blended variants are the same event type as the SymGWR-T and SymGWR-R rows.
+- Events = reference-change events located by bisection and evaluated on both sides, summed over seeds; tie-plane events excluded: 0. SymGWR-T/R and the blended variants use independently drawn segments, so event counts differ between them. For the blended variants at most 5,000 events per split and seed are evaluated (random subsample; 50,000 = capped in all 10 seeds).
 
 ### Table 4. Design audit of the degree-5 fit
 

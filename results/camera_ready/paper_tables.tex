@@ -15,8 +15,11 @@ Method & RMSE (J/mol) & MAPE (\%) & $1-R^2$ & Note \\
 \multicolumn{5}{l}{\textit{Random split: 10 effective independent partitions (i)}} \\
 \midrule
 SymGWR-T & $2.25 \pm 0.15$ & $(2.06 \pm 0.07)\times10^{-3}$ & $(9.83 \pm 1.36)\times10^{-9}$ &  \\
-SymGWR-R & \textbf{$1.16 \pm 0.10$} & \textbf{$(7.20 \pm 0.39)\times10^{-4}$} & \textbf{$(2.61 \pm 0.44)\times10^{-9}$} &  \\
+SymGWR-R & $1.16 \pm 0.10$ & $(7.20 \pm 0.39)\times10^{-4}$ & $(2.61 \pm 0.44)\times10^{-9}$ &  \\
 \midrule
+SymGWR-R-IDW (k=4) & $1.39 \pm 0.81$ & $(4.52 \pm 1.15)\times10^{-4}$ & $(4.88 \pm 5.58)\times10^{-9}$ &  \\
+SymGWR-R-CS (k=4) & $1.01 \pm 0.49$ & $(3.97 \pm 0.66)\times10^{-4}$ & $(2.38 \pm 2.58)\times10^{-9}$ &  \\
+Cubic along T / arm & \textbf{$0.800 \pm 0.448$} & \textbf{$(1.74 \pm 0.21)\times10^{-4}$} & \textbf{$(1.61 \pm 2.21)\times10^{-9}$} &  \\
 Linear & $1292 \pm 19$ & $1.09 \pm 0.02$ & $(3.24 \pm 0.10)\times10^{-3}$ &  \\
 Ridge & $1293 \pm 19$ & $1.09 \pm 0.02$ & $(3.24 \pm 0.10)\times10^{-3}$ &  \\
 Polynomial & $18.1 \pm 0.9$ & $0.0124 \pm 0.0002$ & $(6.37 \pm 0.53)\times10^{-7}$ &  \\
@@ -24,16 +27,19 @@ k-NN & $578 \pm 25$ & $0.513 \pm 0.020$ & $(6.48 \pm 0.46)\times10^{-4}$ &  \\
 Decision tree & $590 \pm 31$ & $0.428 \pm 0.015$ & $(6.77 \pm 0.74)\times10^{-4}$ &  \\
 XGBoost & $154 \pm 8$ & $0.103 \pm 0.007$ & $(4.60 \pm 0.55)\times10^{-5}$ &  \\
 MLP & $129 \pm 17$ & $0.108 \pm 0.013$ & $(3.29 \pm 0.89)\times10^{-5}$ &  \\
-Kernel regression & $3517 \pm 103$ & $2.98 \pm 0.11$ & $0.0240 \pm 0.0009$ & a \\
-LOESS & $425 \pm 11$ & $0.356 \pm 0.009$ & $(3.51 \pm 0.17)\times10^{-4}$ & a \\
-PINN & $223 \pm 134$ & $0.208 \pm 0.156$ & $(1.28 \pm 1.69)\times10^{-4}$ & b \\
+Kernel regression & $3517 \pm 103$ & $2.98 \pm 0.11$ & $0.0240 \pm 0.0009$ & b \\
+LOESS & $425 \pm 11$ & $0.356 \pm 0.009$ & $(3.51 \pm 0.17)\times10^{-4}$ & b \\
+PINN & $223 \pm 134$ & $0.208 \pm 0.156$ & $(1.28 \pm 1.69)\times10^{-4}$ & c \\
+GP & $8.40 \pm 0.45$ & $(5.88 \pm 0.23)\times10^{-3}$ & $(1.37 \pm 0.13)\times10^{-7}$ & d \\
 PySR & $1219 \pm 159$ & $1.10 \pm 0.15$ & $(2.93 \pm 0.79)\times10^{-3}$ &  \\
-GP & — & — & — &  \\
 \multicolumn{5}{l}{\textit{Temp.-band split: 1 effective independent partition (ii)}} \\
 \midrule
 SymGWR-T & 43.0 $\pm$ 0 & 0.0369 $\pm$ 0 & $3.86\times10^{-5}$ $\pm$ 0 &  \\
-SymGWR-R & \textbf{2.24 $\pm$ 0} & \textbf{$1.54\times10^{-3}$ $\pm$ 0} & \textbf{$1.04\times10^{-7}$ $\pm$ 0} &  \\
+SymGWR-R & 2.24 $\pm$ 0 & $1.54\times10^{-3}$ $\pm$ 0 & $1.04\times10^{-7}$ $\pm$ 0 &  \\
 \midrule
+SymGWR-R-IDW (k=4) & $5.46 \pm 0.04$ & $(2.42 \pm 0.03)\times10^{-3}$ & $(6.23 \pm 0.09)\times10^{-7}$ &  \\
+SymGWR-R-CS (k=4) & $3.65 \pm 0.06$ & $(1.90 \pm 0.01)\times10^{-3}$ & $(2.78 \pm 0.09)\times10^{-7}$ &  \\
+Cubic along T / arm & \textbf{0.553 $\pm$ 0} & \textbf{$2.65\times10^{-4}$ $\pm$ 0} & \textbf{$6.38\times10^{-9}$ $\pm$ 0} &  \\
 Linear & 1394 $\pm$ 0 & 1.31 $\pm$ 0 & 0.0406 $\pm$ 0 &  \\
 Ridge & 1394 $\pm$ 0.20 & 1.31 $\pm$ $1.0\times10^{-3}$ & 0.0406 $\pm$ $1.2\times10^{-5}$ &  \\
 Polynomial & 17.5 $\pm$ 0 & 0.0120 $\pm$ 0 & $6.36\times10^{-6}$ $\pm$ 0 &  \\
@@ -41,16 +47,19 @@ k-NN & $4675 \pm 3$ & 4.78 $\pm$ $3.8\times10^{-3}$ & $0.457 \pm 0.001$ &  \\
 Decision tree & 4771 $\pm$ 0 & 4.74 $\pm$ 0 & 0.475 $\pm$ 0 &  \\
 XGBoost & $9079 \pm 2$ & 8.66 $\pm$ $2.7\times10^{-3}$ & 1.72 $\pm$ $7.8\times10^{-4}$ &  \\
 MLP & $246 \pm 29$ & $0.212 \pm 0.024$ & $(1.27 \pm 0.30)\times10^{-3}$ &  \\
-Kernel regression & $2793 \pm 79$ & $2.69 \pm 0.07$ & $0.163 \pm 0.009$ & a \\
-LOESS & $608 \pm 7$ & $0.566 \pm 0.007$ & $(7.72 \pm 0.18)\times10^{-3}$ & a \\
-PINN & $285 \pm 169$ & $0.259 \pm 0.170$ & $(2.23 \pm 3.14)\times10^{-3}$ & b \\
+Kernel regression & $2793 \pm 79$ & $2.69 \pm 0.07$ & $0.163 \pm 0.009$ & b \\
+LOESS & $608 \pm 7$ & $0.566 \pm 0.007$ & $(7.72 \pm 0.18)\times10^{-3}$ & b \\
+PINN & $285 \pm 169$ & $0.259 \pm 0.170$ & $(2.23 \pm 3.14)\times10^{-3}$ & c \\
+GP & $8.42 \pm 0.10$ & $(5.84 \pm 0.07)\times10^{-3}$ & $(1.48 \pm 0.04)\times10^{-6}$ & d \\
 PySR & $1308 \pm 241$ & $1.24 \pm 0.22$ & $0.0368 \pm 0.0137$ &  \\
-GP & $8.42 \pm 0.10$ & $(5.84 \pm 0.07)\times10^{-3}$ & $(1.48 \pm 0.04)\times10^{-6}$ & c \\
 \multicolumn{5}{l}{\textit{Comp.-group split: 5 effective independent partitions (iii)}} \\
 \midrule
 SymGWR-T & $124 \pm 98$ & $0.0630 \pm 0.0336$ & $(4.72 \pm 8.79)\times10^{-5}$ &  \\
-SymGWR-R & $60.0 \pm 64.3$ & \textbf{$0.0322 \pm 0.0293$} & $(1.44 \pm 3.14)\times10^{-5}$ &  \\
+SymGWR-R & $60.0 \pm 64.3$ & $0.0322 \pm 0.0293$ & $(1.44 \pm 3.14)\times10^{-5}$ &  \\
 \midrule
+SymGWR-R-IDW (k=4) & $59.6 \pm 64.4$ & $0.0310 \pm 0.0293$ & $(1.44 \pm 3.14)\times10^{-5}$ &  \\
+SymGWR-R-CS (k=4) & $59.6 \pm 64.4$ & \textbf{$0.0304 \pm 0.0293$} & $(1.44 \pm 3.14)\times10^{-5}$ &  \\
+Cubic along T / arm & $3.34 \pm 2.36$ & $(1.47 \pm 0.90)\times10^{-3}$ & $(3.16 \pm 4.29)\times10^{-8}$ & a \\
 Linear & $1331 \pm 219$ & $1.14 \pm 0.12$ & $(3.49 \pm 1.08)\times10^{-3}$ &  \\
 Ridge & $1352 \pm 206$ & $1.15 \pm 0.12$ & $(3.59 \pm 1.04)\times10^{-3}$ &  \\
 Polynomial & \textbf{$53.3 \pm 17.9$} & $0.0380 \pm 0.0109$ & \textbf{$(6.06 \pm 4.06)\times10^{-6}$} &  \\
@@ -58,23 +67,25 @@ k-NN & $635 \pm 270$ & $0.531 \pm 0.181$ & $(9.14 \pm 8.70)\times10^{-4}$ &  \\
 Decision tree & $704 \pm 260$ & $0.490 \pm 0.157$ & $(1.08 \pm 0.85)\times10^{-3}$ &  \\
 XGBoost & $928 \pm 423$ & $0.611 \pm 0.215$ & $(1.99 \pm 2.16)\times10^{-3}$ &  \\
 MLP & $324 \pm 285$ & $0.226 \pm 0.120$ & $(3.53 \pm 7.58)\times10^{-4}$ &  \\
-Kernel regression & $3505 \pm 96$ & $2.97 \pm 0.12$ & $0.0238 \pm 0.0016$ & a \\
-LOESS & $1087 \pm 1746$ & $0.652 \pm 0.701$ & $(7.83 \pm 22.97)\times10^{-3}$ & a \\
-PINN & $309 \pm 218$ & $0.239 \pm 0.146$ & $(2.72 \pm 4.23)\times10^{-4}$ & b \\
+Kernel regression & $3505 \pm 96$ & $2.97 \pm 0.12$ & $0.0238 \pm 0.0016$ & b \\
+LOESS & $1087 \pm 1746$ & $0.652 \pm 0.701$ & $(7.83 \pm 22.97)\times10^{-3}$ & b \\
+PINN & $309 \pm 218$ & $0.239 \pm 0.146$ & $(2.72 \pm 4.23)\times10^{-4}$ & c \\
+GP & $84.0 \pm 106.8$ & $0.0461 \pm 0.0306$ & $(3.27 \pm 8.62)\times10^{-5}$ & d \\
 PySR & $1288 \pm 200$ & $1.12 \pm 0.10$ & $(3.27 \pm 1.06)\times10^{-3}$ &  \\
-GP & — & — & — &  \\
 \bottomrule
 \end{tabular}
 \par\smallskip
 \begin{minipage}{\linewidth}\scriptsize\raggedright
 "$\pm$ 0": std below 1e-08 of the mean (numerical noise; fixed test set and deterministic fit), not exactly zero.\par
 SymGWR-T = degree-5 polynomial + k=1 nearest-reference Taylor surrogate (\texttt{SymGWR} in the CSVs); SymGWR-R = residual-anchored variant (\texttt{residual\_anchored}, from taylor\_variants\_accuracy\_per\_seed.csv).\par
+SymGWR-R-IDW / SymGWR-R-CS (k=4) = residual-anchored polynomial plus an inverse-distance / compactly supported blend of the k nearest reference residuals (ridwcs\_accuracy\_per\_seed.csv); the cubic row is a cubic interpolant along T (random, temp.-band) or along the composition arm (comp.-group) through the reference rows (interp\_baselines\_per\_seed.csv).\par
 (i) Random: 10 random 60/20/20 resamples; test sets overlap, pairs not strictly independent\par
 (ii) Temp.-band: test set fixed (1,568 rows, same for every seed); only train/val partition varies\par
 (iii) Comp.-group: 5 folds x 2 shuffles: test fold = seed \% 5, so 5 distinct test sets, each seen twice\par
-(a) train rows capped at 2500 (random subsample, seed-dependent); val rows added on refit\par
-(b) temperature column moved to index 0 before train\_pinn: the library physics loss penalises dG/d(feature 0), and feature 0 in the data is Mass\_fraction\_Nb\par
-(c) GP protocol: alpha tuned on a 1000-row train subsample (val MSE), then ONE refit on train (capped 2500) + val; 25 min timeout\par
+(a) Comp.-group: cubic along the composition arm is defined for only 81\% of the test rows (composition bracketed by reference compositions on its arm; star-centre and out-of-range rows have no value). Its metrics are on those rows only, where SymGWR-T has MAPE 0.0434\% (all rows: 0.0630\%); it is therefore excluded from the bold best-of ranking in this split.\par
+(b) train rows capped at 2500 (random subsample, seed-dependent); val rows added on refit\par
+(c) temperature column moved to index 0 before train\_pinn: the library physics loss penalises dG/d(feature 0), and feature 0 in the data is Mass\_fraction\_Nb\par
+(d) GP protocol: alpha tuned on a 1000-row train subsample (val MSE), then ONE refit on train (capped 2500) + val; 25 min timeout\par
 Seeds per method: 10; timeouts: 0, errors: 0.\par
 \end{minipage}
 \end{table*}
@@ -112,34 +123,52 @@ Held-out = FD points whose centre row is not in that seed's train+val. A random 
 % ---- Table 3: Continuity of the nearest-reference surrogates on short segments
 \begin{table*}[t]
 \centering
-\caption{Jump of the surrogate across nearest-reference switches on 5,000 short segments per seed (10 seeds). Short segments start at a test query and have length 0.1--1.0$\times$ the nearest-reference distance. Value jump in J/mol; gradient jump relative to the median model gradient norm. Median and p95 are averaged over seeds; max is the maximum over seeds.}
+\caption{Jump of the surrogate across reference-change events on 5,000 short segments per split and seed (10 seeds). Short segments start at a test query and have length 0.1--1.0$\times$ the nearest-reference distance. Value jump in J/mol; gradient jump relative to the median model gradient norm. Median and p95 are averaged over seeds; max is the maximum over seeds.}
 \label{tab:continuity}
-\footnotesize
+\scriptsize
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{llrrrrrrr}
 \toprule
 \multicolumn{3}{c}{} & \multicolumn{3}{c}{Value jump (J/mol)} & \multicolumn{3}{c}{Gradient jump (rel.)} \\
 \cmidrule(lr){4-6}\cmidrule(lr){7-9}
-Split & Variant & Switches & Median & p95 & Max & Median & p95 & Max \\
+Variant & Event & Events & Median & p95 & Max & Median & p95 & Max \\
 \midrule
-Random & SymGWR-T & 16560 & 0.480 & 4.92 & 156 & 0.0248 & 0.0598 & 0.206 \\
-Random & SymGWR-R & 16560 & 0.477 & 3.96 & 145 & $6.17\times10^{-17}$ & $2.45\times10^{-16}$ & $8.50\times10^{-16}$ \\
-Random & SymGWR-R-IDW & not available & — & — & — & — & — & — \\
+\multicolumn{9}{l}{\textit{Random split}} \\
 \midrule
-Temp.-band & SymGWR-T & 4904 & 58.4 & 422 & 2351 & 0.123 & 0.407 & 0.525 \\
-Temp.-band & SymGWR-R & 4904 & 3.59 & 24.5 & 136 & $1.42\times10^{-17}$ & $2.04\times10^{-16}$ & $5.27\times10^{-16}$ \\
-Temp.-band & SymGWR-R-IDW & not available & — & — & — & — & — & — \\
+SymGWR-T & NN switch & 16560 & 0.480 & 4.92 & 156 & 0.0248 & 0.0598 & 0.206 \\
+SymGWR-R & NN switch & 16560 & 0.477 & 3.96 & 145 & $6.17\times10^{-17}$ & $2.45\times10^{-16}$ & $8.50\times10^{-16}$ \\
+SymGWR-R-IDW (k=4) & NN switch & 16601 & $4.51\times10^{-12}$ & 0.0809 & 2.25 & $7.61\times10^{-17}$ & $1.74\times10^{-5}$ & $8.01\times10^{-3}$ \\
+SymGWR-R-IDW (k=4) & k-set & 9343 & 0.0417 & 0.735 & 28.7 & $2.32\times10^{-5}$ & $7.54\times10^{-4}$ & 0.0176 \\
+SymGWR-R-CS (k=4) & NN switch & 16738 & $2.53\times10^{-12}$ & $1.01\times10^{-11}$ & $4.06\times10^{-11}$ & $3.75\times10^{-7}$ & $9.19\times10^{-5}$ & 0.0195 \\
+SymGWR-R-CS (k=4) & k-set & 9274 & $2.30\times10^{-12}$ & $1.01\times10^{-11}$ & $4.06\times10^{-11}$ & $5.72\times10^{-5}$ & $7.94\times10^{-4}$ & 0.184 \\
+SymGWR-R-CS (k=4) & support & 15642 & $2.46\times10^{-12}$ & $1.01\times10^{-11}$ & $4.06\times10^{-11}$ & $7.05\times10^{-6}$ & $2.39\times10^{-4}$ & 0.0746 \\
 \midrule
-Comp.-group & SymGWR-T & 97498 & 9.32 & 190 & 12344 & 0.0134 & 0.150 & 6.34 \\
-Comp.-group & SymGWR-R & 97498 & 0.366 & 19.5 & 188 & $7.83\times10^{-17}$ & $3.27\times10^{-16}$ & $1.09\times10^{-14}$ \\
-Comp.-group & SymGWR-R-IDW & not available & — & — & — & — & — & — \\
+\multicolumn{9}{l}{\textit{Temp.-band split}} \\
+\midrule
+SymGWR-T & NN switch & 4904 & 58.4 & 422 & 2351 & 0.123 & 0.407 & 0.525 \\
+SymGWR-R & NN switch & 4904 & 3.59 & 24.5 & 136 & $1.42\times10^{-17}$ & $2.04\times10^{-16}$ & $5.27\times10^{-16}$ \\
+SymGWR-R-IDW (k=4) & NN switch & 4912 & $9.83\times10^{-15}$ & $2.41\times10^{-12}$ & 29.1 & $1.45\times10^{-17}$ & $2.00\times10^{-16}$ & $7.31\times10^{-3}$ \\
+SymGWR-R-IDW (k=4) & k-set & 33072 & 0.673 & 9.81 & 31.9 & $1.35\times10^{-4}$ & $1.47\times10^{-3}$ & $8.72\times10^{-3}$ \\
+SymGWR-R-CS (k=4) & NN switch & 4802 & $1.74\times10^{-14}$ & $2.17\times10^{-12}$ & $2.52\times10^{-11}$ & $2.56\times10^{-6}$ & $1.28\times10^{-3}$ & 0.159 \\
+SymGWR-R-CS (k=4) & k-set & 33175 & $2.42\times10^{-13}$ & $2.79\times10^{-12}$ & $1.40\times10^{-11}$ & $4.98\times10^{-4}$ & $8.43\times10^{-3}$ & 0.318 \\
+SymGWR-R-CS (k=4) & support & 49172 & $1.70\times10^{-13}$ & $2.79\times10^{-12}$ & $1.40\times10^{-11}$ & $3.99\times10^{-5}$ & $3.37\times10^{-3}$ & 0.259 \\
+\midrule
+\multicolumn{9}{l}{\textit{Comp.-group split}} \\
+\midrule
+SymGWR-T & NN switch & 97498 & 9.32 & 190 & 12344 & 0.0134 & 0.150 & 6.34 \\
+SymGWR-R & NN switch & 97498 & 0.366 & 19.5 & 188 & $7.83\times10^{-17}$ & $3.27\times10^{-16}$ & $1.09\times10^{-14}$ \\
+SymGWR-R-IDW (k=4) & NN switch & 50000 & $2.71\times10^{-12}$ & 3.21 & 46.2 & $9.30\times10^{-17}$ & $4.68\times10^{-5}$ & $4.23\times10^{-3}$ \\
+SymGWR-R-IDW (k=4) & k-set & 50000 & 0.466 & 12.8 & 46.3 & $1.19\times10^{-5}$ & $1.69\times10^{-3}$ & 0.0218 \\
+SymGWR-R-CS (k=4) & NN switch & 50000 & $2.08\times10^{-12}$ & $1.21\times10^{-11}$ & $1.16\times10^{-10}$ & $1.62\times10^{-16}$ & 0.0289 & 1.50 \\
+SymGWR-R-CS (k=4) & k-set & 50000 & $2.01\times10^{-12}$ & $1.23\times10^{-11}$ & $1.49\times10^{-10}$ & $6.91\times10^{-4}$ & 0.140 & 13.0 \\
+SymGWR-R-CS (k=4) & support & 50000 & $1.73\times10^{-12}$ & $1.11\times10^{-11}$ & $1.19\times10^{-10}$ & $1.16\times10^{-5}$ & 0.0375 & 13.0 \\
 \bottomrule
 \end{tabular}
 \par\smallskip
 \begin{minipage}{\linewidth}\scriptsize\raggedright
 SymGWR-T extrapolates linearly from the nearest reference, so value and gradient both jump at cell boundaries. SymGWR-R adds a constant offset to the polynomial P, so its gradient (grad P) is continuous (jumps are zero up to rounding) and only the value jumps.\par
-Not available: SymGWR-R-IDW is not a variant in continuity\_summary.csv (run\_continuity\_audit.py currently covers SymGWR-T, SymGWR-R only).\par
-Switches = nearest-reference switches located by bisection and evaluated on both sides, summed over seeds; tie-plane switches excluded: 0.\par
+SymGWR-R-IDW / -CS blend the residuals of the k=4 nearest references. Event: NN switch = the nearest reference changes; k-set = the set of the k nearest references changes (k-th and (k+1)-th reference swap); support (CS only) = the (k+1)-th reference changes with the k-set unchanged, which moves the support radius. The NN-switch rows of the blended variants are the same event type as the SymGWR-T and SymGWR-R rows.\par
+Events = reference-change events located by bisection and evaluated on both sides, summed over seeds; tie-plane events excluded: 0. SymGWR-T/R and the blended variants use independently drawn segments, so event counts differ between them. For the blended variants at most 5,000 events per split and seed are evaluated (random subsample; 50,000 = capped in all 10 seeds).\par
 \end{minipage}
 \end{table*}
 

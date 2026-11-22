@@ -8,12 +8,12 @@ number is read or computed from those files; nothing is typed in by hand.
 Tables
   1  main accuracy: methods x splits (RMSE, MAPE, 1-R2; mean +/- std over seeds)
   2  derivative fidelity per axis, with identifiability notes
-  3  continuity of the nearest-reference surrogates (short segments)
+  3  continuity of the reference-based surrogates (short segments; SymGWR-T/R, R-IDW and R-CS at k=4)
   4  design audit (rows, compositions, rank, condition number, duplicate leakage)
   5  scaling (rendered once results/camera_ready/scaling*.csv exists)
 
-Quantities that are not in the inputs (e.g. a SymGWR-R-IDW continuity row) are
-rendered as an explicit "not available" row, never invented.
+Quantities that are not in the inputs (a missing input CSV) are rendered as an
+explicit "not available" / "pending" row, never invented.
 
 LaTeX needs \\usepackage{booktabs}; wide tables use table* (IEEEtran two-column).
 """
@@ -37,6 +37,10 @@ SPLIT_LABEL = {"random": "Random", "temp_band": "Temp.-band", "composition_group
 # CSV variant name -> paper name
 VARIANT_LABEL = {"SymGWR": "SymGWR-T", "residual_anchored": "SymGWR-R", "residual_anchored_idw": "SymGWR-R-IDW"}
 CONT_VARIANTS = ["SymGWR", "residual_anchored", "residual_anchored_idw"]
+K_SHOW = 4   # k of the SymGWR-R-IDW / SymGWR-R-CS rows in Tables 1 and 3
+# internal Table-1 keys for the rows that do not come from baselines_*_summary.csv
+M_IDW, M_CS, M_CUBIC = f"R-IDW_k{K_SHOW}", f"R-CS_k{K_SHOW}", "cubic_T_or_arm"
+VARIANT_LABEL.update({M_IDW: f"SymGWR-R-IDW (k={K_SHOW})", M_CS: f"SymGWR-R-CS (k={K_SHOW})", M_CUBIC: "Cubic along T / arm"})
 AXES = ["T", "Nb", "Al", "Ti", "Mo", "Fe", "Cr", "Ni"]
 AXIS_UNIT = {"T": "J/(mol K)"}
 IDENT_TOL = 1e-9   # null_frac below this = identified
@@ -275,6 +279,25 @@ def pnote(s):
 # ----------------------------------------------------------------------
 #  Table 1: main accuracy
 # ----------------------------------------------------------------------
+def _seed_stats(d):
+    """Per-seed rows -> same stats dict as the baseline summaries (ddof=1)."""
+    return dict(rmse=(d["rmse"].mean(), d["rmse"].std(ddof=1)), mape=(100 * d["mape_raw"].mean(), 100 * d["mape_raw"].std(ddof=1)),
+                omr2=(1 - d["r2"].mean(), d["r2"].std(ddof=1)), n=int(d["seed"].nunique()), nto=0, ner=0, note=None)
+
+
+def _check_combined(stats):
+    """Recomputed RMSE means must agree with the strings in ridwcs_combined_table.csv (3 significant figures)."""
+    comb = rd("ridwcs_combined_table.csv")
+    for (key, s), st in stats.items():
+        if key not in (M_IDW, M_CS, M_CUBIC):
+            continue
+        r = comb[(comb["split"] == s) & (comb["method"] == ("cubic_T_or_arm" if key == M_CUBIC else key.replace("R-", "SymGWR-R-")))]
+        if len(r) == 0:
+            continue
+        ref = float(r["rmse_J_per_mol"].iloc[0].split("±")[0])
+        assert abs(st["rmse"][0] - ref) <= 5e-3 * abs(ref), f"RMSE mismatch vs ridwcs_combined_table.csv: {key}/{s}: {st['rmse'][0]} vs {ref}"
+
+
 def table_accuracy():
     global zero_std_used
     zero_std_used = False
@@ -299,12 +322,50 @@ def table_accuracy():
         stats[("residual_anchored", s)] = dict(
             rmse=(d["rmse"].mean(), d["rmse"].std(ddof=1)), mape=(100 * d["mape_raw"].mean(), 100 * d["mape_raw"].std(ddof=1)),
             omr2=(1 - d["r2"].mean(), d["r2"].std(ddof=1)), n=int(d["seed"].nunique()), nto=0, ner=0, note=None)
-    order = ["SymGWR"] + (["residual_anchored"] if ("residual_anchored", SPLITS[0]) in stats else []) + \
+    # SymGWR-R-IDW / -CS (k=K_SHOW) and the cubic-along-T/arm interpolant, from their per-seed files
+    # (full precision for 1-R2; cross-checked against ridwcs_combined_table.csv below)
+    extra, cov_arm, same_rows = [], {}, {}
+    try:
+        acc = rd("ridwcs_accuracy_per_seed.csv")
+        for key, name in ((M_IDW, f"SymGWR-R-IDW_k{K_SHOW}"), (M_CS, f"SymGWR-R-CS_k{K_SHOW}")):
+            for s in SPLITS:
+                d = acc[(acc["method"] == name) & (acc["split"] == s)]
+                if len(d):
+                    stats[(key, s)] = _seed_stats(d)
+            if (key, SPLITS[0]) in stats:
+                extra.append(key)
+    except FileNotFoundError:
+        pass
+    try:
+        ib = rd("interp_baselines_per_seed.csv")
+        for s, meth in (("random", "b_cubic_T"), ("temp_band", "b_cubic_T"), ("composition_group", "e_cubic_arm")):
+            d = ib[(ib["method"] == meth) & (ib["split"] == s) & ib["status"].isin(["ok", "partial"])]
+            if len(d):
+                stats[(M_CUBIC, s)] = _seed_stats(d)
+                cov_arm[s] = float((d["n_eval"] / d["n_test"]).mean())
+                same_rows[s] = 100 * float(d["symgwr_mape_same_rows"].mean())
+        if any((M_CUBIC, s) in stats for s in SPLITS):
+            extra.append(M_CUBIC)
+    except FileNotFoundError:
+        pass
+    try:
+        _check_combined(stats)
+    except FileNotFoundError:
+        pass
+    partial = {s for s, c in cov_arm.items() if c < 1 - 1e-9}   # splits where the cubic covers only part of the test rows
+    order = ["SymGWR"] + (["residual_anchored"] if ("residual_anchored", SPLITS[0]) in stats else []) + extra + \
         [m for m in models if m != "SymGWR"]
 
     # footnote markers for method-level notes
     letters = "abcdefghij"
     note_mark, note_list = {}, []
+    if partial:
+        for s in partial:
+            stats[(M_CUBIC, s)]["note"] = (
+                f"{SPLIT_LABEL[s]}: cubic along the composition arm is defined for only {100 * cov_arm[s]:.0f}% of the test rows "
+                "(composition bracketed by reference compositions on its arm; star-centre and out-of-range rows have no value). "
+                f"Its metrics are on those rows only, where SymGWR-T has MAPE {same_rows[s]:.4f}% (all rows: "
+                f"{stats[('SymGWR', s)]['mape'][0]:.4f}%); it is therefore excluded from the bold best-of ranking in this split.")
     for m in order:
         for s in SPLITS:
             n_ = stats.get((m, s), {}).get("note")
@@ -329,7 +390,7 @@ def table_accuracy():
     best = {}
     for s in SPLITS:
         for k in ("rmse", "mape", "omr2"):
-            vals = {m: stats[(m, s)][k][0] for m in order if (m, s) in stats}
+            vals = {m: stats[(m, s)][k][0] for m in order if (m, s) in stats and not (m == M_CUBIC and s in partial)}
             best[(s, k)] = min(vals, key=vals.get)
 
     for s in SPLITS:
@@ -359,6 +420,10 @@ def table_accuracy():
         tab.note(f"\"± 0\": std below {ZERO_STD_REL:g} of the mean (numerical noise; fixed test set and deterministic fit), not exactly zero.")
     tab.note("SymGWR-T = degree-5 polynomial + k=1 nearest-reference Taylor surrogate (`SymGWR` in the CSVs); "
              "SymGWR-R = residual-anchored variant (`residual_anchored`, from taylor_variants_accuracy_per_seed.csv).")
+    if extra:
+        tab.note(f"SymGWR-R-IDW / SymGWR-R-CS (k={K_SHOW}) = residual-anchored polynomial plus an inverse-distance / compactly supported blend of the k nearest "
+                 "reference residuals (ridwcs_accuracy_per_seed.csv); the cubic row is a cubic interpolant along T (random, temp.-band) or along the "
+                 "composition arm (comp.-group) through the reference rows (interp_baselines_per_seed.csv).")
     for s in SPLITS:
         tab.note(f"({roman[s]}) {SPLIT_LABEL[s]}: {eff[s][1]}")
     for n_ in note_list:
@@ -453,57 +518,89 @@ def table_derivative():
 # ----------------------------------------------------------------------
 #  Table 3: continuity (short segments)
 # ----------------------------------------------------------------------
+def _cont_cols(df):
+    """Column names (value jump J/mol, gradient jump relative) of a continuity summary file."""
+    g = lambda base: next(c for c in df.columns if c.startswith(base))
+    return ([g(f"value_jump_raw_{k}(") for k in ("median", "p95", "max")] +
+            [g(f"grad_jump_over_gradnorm_{k}(") for k in ("median", "p95", "max")])
+
+
+EVENT_LABEL = {"nearest_ref_switch": "NN switch", "kset_change": "k-set", "support_ref_change": "support"}
+
+
 def table_continuity():
     summ = rd("continuity_summary.csv")
     per = rd("continuity_per_seed.csv")
     short = summ[summ["segment_type"] == "short"]
     pshort = per[per["segment_type"] == "short"]
     present = set(short["variant"])
-    vcol = lambda base: next(c for c in short.columns if c.startswith(base))
-    c_vmed, c_vp95, c_vmax = (vcol(f"value_jump_raw_{k}") for k in ("median", "p95", "max"))
-    c_gmed, c_gp95, c_gmax = (vcol(f"grad_jump_over_gradnorm_{k}(") for k in ("median", "p95", "max"))
+    cols_t = _cont_cols(short)
     nseg = int(pshort["n_segments"].iloc[0])
     nseeds = int(short["n_seeds"].max())
 
+    # SymGWR-R-IDW / SymGWR-R-CS (k=K_SHOW): short segments, ridw_*.csv / ridwcs_*.csv
+    extra = {}   # variant label -> (summary, per-seed, filter, [events])
+    try:
+        ri, rip = rd("ridw_continuity_summary.csv"), rd("ridw_continuity_per_seed.csv")
+        extra["residual_anchored_idw"] = (ri[ri["k"] == K_SHOW], rip[rip["k"] == K_SHOW], ["nearest_ref_switch", "kset_change"])
+    except FileNotFoundError:
+        pass
+    try:
+        rc, rcp = rd("ridwcs_continuity_summary.csv"), rd("ridwcs_continuity_per_seed.csv")
+        extra["residual_anchored_cs"] = (rc[(rc["k"] == K_SHOW) & (rc["kind"] == "cs")], rcp[(rcp["k"] == K_SHOW) & (rcp["kind"] == "cs")],
+                                         ["nearest_ref_switch", "kset_change", "support_ref_change"])
+    except FileNotFoundError:
+        pass
+    extra_label = {"residual_anchored_idw": f"SymGWR-R-IDW (k={K_SHOW})", "residual_anchored_cs": f"SymGWR-R-CS (k={K_SHOW})"}
+    variants = ["SymGWR", "residual_anchored", "residual_anchored_idw", "residual_anchored_cs"]
+
     tab = Table("continuity", "Continuity of the nearest-reference surrogates on short segments",
-                f"Jump of the surrogate across nearest-reference switches on {nseg:,} short segments per seed ({nseeds} seeds). "
-                "Short segments start at a test query and have length 0.1-1.0x the nearest-reference distance. "
-                "Value jump in J/mol; gradient jump relative to the median model gradient norm.",
-                "llrrrrrrr",
-                ["Split", "Variant", "Switches", "Value med.", "Value p95", "Value max", "Grad med.", "Grad p95", "Grad max"],
-                groups=[("", 3), ("Value jump (J/mol)", 3), ("Gradient jump (rel.)", 3)], wide=True)
-    tab.caption = (f"Jump of the surrogate across nearest-reference switches on {nseg:,} short segments per seed ({nseeds} seeds). "
+                "", "llrrrrrrr",
+                ["Variant", "Event", "Events", "Median", "p95", "Max", "Median", "p95", "Max"],
+                groups=[("", 3), ("Value jump (J/mol)", 3), ("Gradient jump (rel.)", 3)], wide=True, size="scriptsize")
+    tab.caption = (f"Jump of the surrogate across reference-change events on {nseg:,} short segments per split and seed ({nseeds} seeds). "
                    "Short segments start at a test query and have length 0.1–1.0× the nearest-reference distance. "
                    "Value jump in J/mol; gradient jump relative to the median model gradient norm. "
                    "Median and p95 are averaged over seeds; max is the maximum over seeds.")
-    # drop the redundant first header group: put it as a plain header
-    tab.header = ["Split", "Variant", "Switches", "Median", "p95", "Max", "Median", "p95", "Max"]
-    tab.groups = [("", 3), ("Value jump (J/mol)", 3), ("Gradient jump (rel.)", 3)]
 
-    missing = [v for v in CONT_VARIANTS if v not in present]
+    label_c = lambda v: extra_label.get(v) or label(v)
+    missing = []
     for s in SPLITS:
-        for v in CONT_VARIANTS:
-            if v not in present:
-                tab.row([T(SPLIT_LABEL[s]), T(label(v)), T("not available")] + [C(EM)] * 6)
-                continue
-            r = short[(short["split"] == s) & (short["variant"] == v)]
-            if len(r) == 0:
-                tab.row([T(SPLIT_LABEL[s]), T(label(v)), T("not available")] + [C(EM)] * 6)
-                continue
-            r = r.iloc[0]
-            nsw = pshort[(pshort["split"] == s) & (pshort["variant"] == v)]["n_switches_evaluated"].sum()
-            tab.row([T(SPLIT_LABEL[s]), T(label(v)), intc(nsw), num(r[c_vmed]), num(r[c_vp95]), num(r[c_vmax]),
-                     num(r[c_gmed]), num(r[c_gp95]), num(r[c_gmax])])
-        if s != SPLITS[-1]:
+        if s != SPLITS[0]:
             tab.rule()
+        tab.section(f"{SPLIT_LABEL[s]} split")
+        for v in variants:
+            if v in extra:
+                sm, pr, events = extra[v]
+                src = [(ev, sm[(sm["split"] == s) & (sm["event"] == ev)], pr[(pr["split"] == s) & (pr["event"] == ev)]) for ev in events]
+                cols = _cont_cols(sm)
+            elif v in present:
+                r = short[short["split"] == s]
+                src = [("nearest_ref_switch", r[r["variant"] == v], pshort[(pshort["split"] == s) & (pshort["variant"] == v)])]
+                cols = cols_t
+            else:
+                src, cols = [("nearest_ref_switch", short.iloc[0:0], None)], None
+                if label_c(v) not in missing:
+                    missing.append(label_c(v))
+            for ev, r, pr_ in src:
+                if len(r) == 0:
+                    tab.row([T(label_c(v)), T(EVENT_LABEL[ev]), T("not available")] + [C(EM)] * 6)
+                    continue
+                r = r.iloc[0]
+                nsw = pr_["n_switches_evaluated" if "n_switches_evaluated" in pr_ else "n_events_evaluated"].sum()
+                tab.row([T(label_c(v)), T(EVENT_LABEL[ev]), intc(nsw)] + [num(r[c]) for c in cols])
     tab.note("SymGWR-T extrapolates linearly from the nearest reference, so value and gradient both jump at cell boundaries. "
              "SymGWR-R adds a constant offset to the polynomial P, so its gradient (grad P) is continuous (jumps are zero up to rounding) and only the value jumps.")
+    tab.note(f"SymGWR-R-IDW / -CS blend the residuals of the k={K_SHOW} nearest references. "
+             "Event: NN switch = the nearest reference changes; k-set = the set of the k nearest references changes (k-th and (k+1)-th reference swap); "
+             "support (CS only) = the (k+1)-th reference changes with the k-set unchanged, which moves the support radius. "
+             "The NN-switch rows of the blended variants are the same event type as the SymGWR-T and SymGWR-R rows.")
     if missing:
-        tab.note("Not available: " + ", ".join(label(v) for v in missing) +
-                 " is not a variant in continuity_summary.csv (run_continuity_audit.py currently covers "
-                 + ", ".join(label(v) for v in sorted(present, key=CONT_VARIANTS.index)) + " only).")
-    tie = int(pshort["n_tie_plane_switches_excluded"].sum())
-    tab.note(f"Switches = nearest-reference switches located by bisection and evaluated on both sides, summed over seeds; tie-plane switches excluded: {tie}.")
+        tab.note("Not available: " + ", ".join(missing) + " (input CSV missing).")
+    tie = int(pshort["n_tie_plane_switches_excluded"].sum()) + sum(int(x[1]["n_tie_plane_excluded"].sum()) for x in extra.values())
+    tab.note(f"Events = reference-change events located by bisection and evaluated on both sides, summed over seeds; tie-plane events excluded: {tie}. "
+             "SymGWR-T/R and the blended variants use independently drawn segments, so event counts differ between them. "
+             "For the blended variants at most 5,000 events per split and seed are evaluated (random subsample; 50,000 = capped in all 10 seeds).")
     return tab
 
 
