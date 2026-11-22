@@ -227,6 +227,47 @@ def compute_all_metrics(
     }
 
 
+def compute_calphad_metrics(
+    y_true_z: np.ndarray,
+    y_pred_z: np.ndarray,
+    target_scaler: "CustomStandardScaler",
+) -> Dict[str, float]:
+    """Metrics for z-scored targets/predictions, reported in raw units too.
+
+    Inputs are in z-scored target units (as models see them); predictions are
+    inverse-transformed with ``target_scaler`` (fit on the training split).
+
+    Returns
+    -------
+    dict with
+      ``mape_raw``       mean |y - yhat| / |y| in raw J/mol (fraction, not %)
+      ``mae_raw``        mean |y - yhat| in raw J/mol
+      ``mape_z``         same MAPE computed on z-scored values (legacy number;
+                         unstable near z = 0, rows with z == 0 are skipped)
+      ``rmse``           RMSE in raw J/mol
+      ``r2``             coefficient of determination (scale invariant)
+      ``rmse_over_std``  RMSE / population std of the true raw targets
+    """
+    y_true_z = np.asarray(y_true_z, dtype=np.float64).ravel()
+    y_pred_z = np.asarray(y_pred_z, dtype=np.float64).ravel()
+    y_true = target_scaler.inverse_transform(y_true_z.reshape(-1, 1)).ravel()
+    y_pred = target_scaler.inverse_transform(y_pred_z.reshape(-1, 1)).ravel()
+
+    err = y_true - y_pred
+    nz = y_true != 0
+    mape_raw = float(np.mean(np.abs(err[nz] / y_true[nz])))
+    rmse_raw = float(np.sqrt(np.mean(err**2)))
+    std = float(np.std(y_true))
+    return {
+        "mape_raw": mape_raw,
+        "mae_raw": float(np.mean(np.abs(err))),
+        "mape_z": mean_absolute_percentage_error(y_true_z, y_pred_z)[0],
+        "rmse": rmse_raw,
+        "r2": float(r2_score(y_true, y_pred)),
+        "rmse_over_std": rmse_raw / std if std > 0 else float("nan"),
+    }
+
+
 def aggregate_metric_dicts(metric_rows: List[Dict[str, float]]) -> Dict[str, float]:
     """Aggregate repeated metric rows into mean/std columns."""
     if not metric_rows:
