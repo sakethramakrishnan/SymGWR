@@ -73,7 +73,7 @@ Test accuracy on the three CALPHAD splits: mean ± std over seeds (std with ddof
 - (b) train rows capped at 2500 (random subsample, seed-dependent); val rows added on refit
 - (c) temperature column moved to index 0 before train_pinn: the library physics loss penalises dG/d(feature 0), and feature 0 in the data is Mass_fraction_Nb
 - (d) GP protocol: alpha tuned on a 1000-row train subsample (val MSE), then ONE refit on train (capped 2500) + val; 25 min timeout
-- Comp.-group: no method is marked best; differences between methods are within the fold-to-fold variation (std over 5 effective independent partitions).
+- Comp.-group: no method is marked best. Pairs compared over the 5 test folds (10 seeds = 5 folds × 2 shuffles, averaged within a fold; paired t-test on log RMSE and log MAPE, 4 df); meaningful = same sign in all 5 folds and p < 0.05 on both metrics, uncorrected; cubic row not tested (different test rows). Leading group (Polynomial, SymGWR-R-IDW, SymGWR-R-CS, SymGWR-R, GP, SymGWR-T): differences within it are within fold variation, except GP and SymGWR-T are worse than SymGWR-R-IDW, SymGWR-R-CS, SymGWR-R. All other methods (Decision tree, LOESS, Linear, MLP, PINN, PySR, Ridge, XGBoost, k-NN, Kernel regression) are worse than every member of the leading group.
 - Seeds per method: 10; timeouts: 0, errors: 0.
 
 ### Table 2. Derivative fidelity of the degree-5 SymGWR polynomial vs. central finite differences

@@ -33,6 +33,7 @@ import sys
 
 import numpy as np
 import pandas as pd
+from scipy import stats as sstats
 
 IN_DIR = "results/camera_ready"
 SPLITS = ["random", "temp_band", "composition_group"]
@@ -81,7 +82,8 @@ def T(s):
 
 
 def bold(c):
-    return C(f"**{c.md}**", rf"\textbf{{{c.tex}}}")
+    # \boldmath (text mode, inside the group) makes the $...$ parts bold too; \textbf alone leaves math in regular weight
+    return C(f"**{c.md}**", rf"\textbf{{\boldmath {c.tex}}}")
 
 
 def cell(x):
@@ -314,6 +316,85 @@ def _check_combined(stats):
         assert abs(st["rmse"][0] - ref) <= 5e-3 * abs(ref), f"RMSE mismatch vs ridwcs_combined_table.csv: {key}/{s}: {st['rmse'][0]} vs {ref}"
 
 
+P_FOLD = 0.05   # comp.-group paired comparison: p threshold (paired t on the log metric over folds)
+
+
+def _compgroup_fold_values():
+    """Per-method fold values of RMSE and raw MAPE on the comp.-group split.
+    The 10 seeds are 5 test folds x 2 shuffles (fold = seed % 5, see partition_note), so seeds are averaged within a fold: 5 paired
+    values per method, not 10 independent ones.  The cubic-along-arm row is left out (it is scored on a different subset of test rows)."""
+    b = rd("baselines_composition_group.csv")
+    b = b[b["status"] == "ok"]
+    src = {m: g for m, g in b.groupby("model")}
+    v = rd("taylor_variants_accuracy_per_seed.csv")
+    src["residual_anchored"] = v[(v["split"] == "composition_group") & (v["method"] == "residual_anchored")]
+    acc = rd("ridwcs_accuracy_per_seed.csv")
+    for key, name in ((M_IDW, f"SymGWR-R-IDW_k{K_SHOW}"), (M_CS, f"SymGWR-R-CS_k{K_SHOW}")):
+        src[key] = acc[(acc["split"] == "composition_group") & (acc["method"] == name)]
+    out = {}
+    for m, g in src.items():
+        g = g.assign(fold=g["seed"] % 5)
+        assert g["fold"].nunique() == 5 and g.groupby("fold")["seed"].nunique().min() >= 1, f"comp.-group folds incomplete for {m}"
+        out[m] = {k: g.groupby("fold")[k].mean().sort_index().to_numpy() for k in ("rmse", "mape_raw")}
+    return out
+
+
+def _compgroup_note():
+    """Footnote for Table 1, comp.-group: which pairwise differences are real.  Computed here, nothing typed in.
+    Pair (a, b) is 'meaningful' if, for BOTH RMSE and MAPE, a is better than b in all 5 folds and the paired t-test on
+    log(metric a) - log(metric b) (4 df) has p < P_FOLD.  Methods that are not separated from each other (connected through
+    non-meaningful pairs) form one group; the group with the lowest mean RMSE is the leading group."""
+    F = _compgroup_fold_values()
+    names = list(F)
+    meaningful, mat = {}, {}
+    for i, a in enumerate(names):
+        for b_ in names[i + 1:]:
+            ok, sign = True, set()
+            for k in ("rmse", "mape_raw"):
+                d = np.log(F[a][k]) - np.log(F[b_][k])
+                p = sstats.ttest_1samp(d, 0.0).pvalue
+                ok &= bool((np.all(d < 0) or np.all(d > 0)) and p < P_FOLD)
+                sign.add(float(np.sign(d.mean())))
+            ok &= len(sign) == 1
+            meaningful[(a, b_)] = meaningful[(b_, a)] = ok
+            mat[(a, b_)] = float(np.sign(np.mean(np.log(F[a]["rmse"]) - np.log(F[b_]["rmse"]))))   # -1: a better
+            mat[(b_, a)] = -mat[(a, b_)]
+    parent = {m: m for m in names}
+
+    def find(x):
+        while parent[x] != x:
+            x = parent[x]
+        return x
+    for (a, b_), ok in meaningful.items():
+        if not ok:
+            parent[find(a)] = find(b_)
+    groups = {}
+    for m in names:
+        groups.setdefault(find(m), []).append(m)
+    mean_rmse = {m: float(np.mean(F[m]["rmse"])) for m in names}
+    ordered = sorted(groups.values(), key=lambda g: min(mean_rmse[m] for m in g))
+    lead = sorted(ordered[0], key=lambda m: mean_rmse[m])
+    rest = [m for g in ordered[1:] for m in g]
+    for a in lead:   # every method outside the leading group must be worse than every member of it
+        for b_ in rest:
+            assert meaningful[(a, b_)] and mat[(a, b_)] < 0, f"unexpected pair {a} vs {b_}"
+    lab = lambda ms: ", ".join(label(m).replace(f" (k={K_SHOW})", "") for m in ms)
+    inner = [(a, b_) for i, a in enumerate(lead) for b_ in lead[i + 1:] if meaningful[(a, b_)]]
+    inner = [(a, b_) if mat[(a, b_)] < 0 else (b_, a) for a, b_ in inner]   # (better, worse)
+    worse_than = {}
+    for good, bad in inner:
+        worse_than.setdefault(bad, []).append(good)
+    by_set = {}   # methods with the same set of better methods are reported together
+    for bad, g in worse_than.items():
+        by_set.setdefault(tuple(sorted(g, key=lambda m: mean_rmse[m])), []).append(bad)
+    nice = lambda ms: " and ".join(label(m).replace(f" (k={K_SHOW})", "") for m in ms) if len(ms) == 2 else lab(ms)
+    inner_txt = "; ".join(f"{nice(sorted(bads, key=lambda m: mean_rmse[m]))} {'are' if len(bads) > 1 else 'is'} worse than {lab(g)}" for g, bads in by_set.items())
+    return (f"{SPLIT_LABEL['composition_group']}: no method is marked best. Pairs compared over the 5 test folds (10 seeds = 5 folds × 2 shuffles, averaged within a fold; "
+            f"paired t-test on log RMSE and log MAPE, 4 df); meaningful = same sign in all 5 folds and p < {P_FOLD} on both metrics, uncorrected; cubic row not tested "
+            f"(different test rows). Leading group ({lab(lead)}): differences within it are within fold variation, except {inner_txt if inner_txt else 'none separated'}. "
+            f"All other methods ({lab(rest)}) are worse than every member of the leading group.")
+
+
 def table_accuracy():
     global zero_std_used
     zero_std_used = False
@@ -401,7 +482,7 @@ def table_accuracy():
     tab = Table("accuracy", "Main accuracy",
                 "Test accuracy on the three CALPHAD splits: mean ± std over seeds (std with ddof=1). "
                 "MAPE is the raw-unit MAPE in percent; R² is reported as 1−R². Bold = best mean per metric in the random and temp.-band splits (no ranking in the comp.-group split).",
-                "lrrrl", ["Method", "RMSE (J/mol)", "MAPE (%)", "$1-R^2$", "Note"], size="scriptsize", wide=True, stretch=0.9)  # 0.9: the long table must fit one page
+                "lrrrl", ["Method", "RMSE (J/mol)", "MAPE (%)", "$1-R^2$", "Note"], size="scriptsize", wide=True, stretch=0.72)  # 0.72: the long table must fit one page
 
     best = {}
     for s in SPLITS:
@@ -448,8 +529,10 @@ def table_accuracy():
         tab.note(f"({note_mark[n_]}) {n_}")
     for s in SPLITS:
         if s in NO_RANK:
-            tab.note(f"{SPLIT_LABEL[s]}: no method is marked best; differences between methods are within the fold-to-fold variation "
-                     f"(std over {eff[s][0]} effective independent partitions).")
+            try:
+                tab.note(_compgroup_note())
+            except FileNotFoundError:
+                tab.note(f"{SPLIT_LABEL[s]}: no method is marked best (per-seed files for the paired fold test not found).")
     tab.note(f"Seeds per method: {', '.join(map(str, n_seeds))}; timeouts: {sum(v['nto'] for v in stats.values())}, "
              f"errors: {sum(v['ner'] for v in stats.values())}.")
     return tab
