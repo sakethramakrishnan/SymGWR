@@ -339,8 +339,10 @@ def _compgroup_fold_values():
     return out
 
 
-def _compgroup_note():
+def _compgroup_note(only=None):
     """Footnote for Table 1, comp.-group: which pairwise differences are real.  Computed here, nothing typed in.
+    only: set of method keys shown in the compact table; the groups are still computed over all methods, but only those
+    keys are named, and the text is shortened.
     Pair (a, b) is 'meaningful' if, for BOTH RMSE and MAPE, a is better than b in all 5 folds and the paired t-test on
     log(metric a) - log(metric b) (4 df) has p < P_FOLD.  Methods that are not separated from each other (connected through
     non-meaningful pairs) form one group; the group with the lowest mean RMSE is the leading group."""
@@ -378,7 +380,8 @@ def _compgroup_note():
     for a in lead:   # every method outside the leading group must be worse than every member of it
         for b_ in rest:
             assert meaningful[(a, b_)] and mat[(a, b_)] < 0, f"unexpected pair {a} vs {b_}"
-    lab = lambda ms: ", ".join(label(m).replace(f" (k={K_SHOW})", "") for m in ms)
+    shown = (lambda ms: [m for m in ms if m in only]) if only is not None else (lambda ms: list(ms))
+    lab = lambda ms: ", ".join(label(m).replace(f" (k={K_SHOW})", "") for m in shown(ms))
     inner = [(a, b_) for i, a in enumerate(lead) for b_ in lead[i + 1:] if meaningful[(a, b_)]]
     inner = [(a, b_) if mat[(a, b_)] < 0 else (b_, a) for a, b_ in inner]   # (better, worse)
     worse_than = {}
@@ -388,14 +391,20 @@ def _compgroup_note():
     for bad, g in worse_than.items():
         by_set.setdefault(tuple(sorted(g, key=lambda m: mean_rmse[m])), []).append(bad)
     nice = lambda ms: " and ".join(label(m).replace(f" (k={K_SHOW})", "") for m in ms) if len(ms) == 2 else lab(ms)
-    inner_txt = "; ".join(f"{nice(sorted(bads, key=lambda m: mean_rmse[m]))} {'are' if len(bads) > 1 else 'is'} worse than {lab(g)}" for g, bads in by_set.items())
+    inner_txt = "; ".join(f"{nice(sorted(shown(bads), key=lambda m: mean_rmse[m]))} {'are' if len(shown(bads)) > 1 else 'is'} worse than {lab(g)}"
+                          for g, bads in by_set.items() if shown(bads) and shown(g))
+    if only is not None:
+        return (f"{SPLIT_LABEL['composition_group']}: no method is marked best. Paired t-test on log RMSE and log MAPE over the 5 test folds "
+                f"(10 seeds = 5 folds × 2 shuffles, averaged within a fold; 4 df); meaningful = same sign in all 5 folds and p < {P_FOLD} on both metrics, "
+                f"uncorrected; cubic row not tested (different test rows). Leading group ({lab(lead)}): differences within it are within fold variation, "
+                f"except {inner_txt if inner_txt else 'none separated'}. The other methods shown ({lab(rest)}) are worse than every member of the leading group.")
     return (f"{SPLIT_LABEL['composition_group']}: no method is marked best. Pairs compared over the 5 test folds (10 seeds = 5 folds × 2 shuffles, averaged within a fold; "
             f"paired t-test on log RMSE and log MAPE, 4 df); meaningful = same sign in all 5 folds and p < {P_FOLD} on both metrics, uncorrected; cubic row not tested "
             f"(different test rows). Leading group ({lab(lead)}): differences within it are within fold variation, except {inner_txt if inner_txt else 'none separated'}. "
             f"All other methods ({lab(rest)}) are worse than every member of the leading group.")
 
 
-def table_accuracy():
+def table_accuracy(compact=False):
     global zero_std_used
     zero_std_used = False
     summ = {s: rd(f"baselines_{s}_summary.csv") for s in SPLITS}
@@ -479,6 +488,9 @@ def table_accuracy():
         eff[s] = (int(vals[0]), pnote(d["partition_note"].iloc[0]))
     roman = {s: "i" * (k + 1) if k < 3 else str(k + 1) for k, s in enumerate(SPLITS)}
 
+    if compact:
+        return _accuracy_compact(stats, order, partial, cov_arm, eff, roman)
+
     tab = Table("accuracy", "Main accuracy",
                 "Test accuracy on the three CALPHAD splits: mean ± std over seeds (std with ddof=1). "
                 "MAPE is the raw-unit MAPE in percent; R² is reported as 1−R². Bold = best mean per metric in the random and temp.-band splits (no ranking in the comp.-group split).",
@@ -537,6 +549,73 @@ def table_accuracy():
              f"errors: {sum(v['ner'] for v in stats.values())}.")
     return tab
 
+COMPACT_ACC_ROWS = ["SymGWR", "residual_anchored", M_CS, M_CUBIC, "Polynomial", "GP", "MLP", "PINN", "XGBoost", "k-NN", "LOESS"]
+
+
+def _accuracy_compact(stats, order, partial, cov_arm, eff, roman):
+    """Compact Table 1: RMSE on the three splits (+ MAPE on the temp.-band split) for a subset of methods; same stats as the full table."""
+    global zero_std_used
+    rows = COMPACT_ACC_ROWS
+    for m in rows:
+        assert all((m, s) in stats for s in SPLITS), f"compact accuracy row {m} missing in the inputs"
+    cols = [("rmse", "random"), ("rmse", "temp_band"), ("rmse", "composition_group"), ("mape", "temp_band")]
+
+    def best_of(keys, k, s):
+        vals = {m: stats[(m, s)][k][0] for m in keys if (m, s) in stats and not (m == M_CUBIC and s in partial)}
+        return min(vals, key=vals.get)
+    best = {}
+    for k, s in cols:
+        if s in NO_RANK:
+            continue
+        best[(k, s)] = best_of(rows, k, s)
+        assert best[(k, s)] == best_of(order, k, s), f"best method for {k}/{s} is not among the compact rows"
+
+    # method notes of the displayed rows only (the cubic note is shortened; the others are the CSV notes)
+    letters, mark, notes = "abcdefghij", {}, []
+    for m in rows:
+        txt = None
+        for s in SPLITS:
+            n_ = stats[(m, s)]["note"]
+            if m == M_CUBIC and s in partial:
+                n_ = (f"{SPLIT_LABEL[s]}: cubic along the composition arm is defined for only {100 * cov_arm[s]:.0f}% of the test rows; "
+                      "its metrics are on those rows only and are not directly comparable with the other rows.")
+            elif m == M_CUBIC:
+                n_ = None
+            txt = txt or n_
+        if txt:
+            mark[m] = letters[len(notes)]
+            notes.append(txt)
+
+    zero_std_used = False
+    tab = Table("c_accuracy", "Main accuracy (compact)",
+                "Test accuracy, mean ± std over seeds (ddof=1): RMSE on the three CALPHAD splits and raw-unit MAPE on the temp.-band split. "
+                "Bold = best mean in the random and temp.-band splits (no ranking in the comp.-group split).",
+                "lrrrr", ["Method", "Random", "Temp.-band", "Comp.-group", "Temp.-band"],
+                groups=[("", 1), ("RMSE (J/mol)", 3), ("MAPE (%)", 1)], wide=True, size="scriptsize")
+    for m in rows:
+        lab = label(m)
+        cells = [C(f"{md_esc(lab)} ({mark[m]})", f"{tex_esc(lab)}$^{{{mark[m]}}}$") if m in mark else T(lab)]
+        for k, s in cols:
+            c = mean_std(*stats[(m, s)][k])
+            cells.append(bold(c) if best.get((k, s)) == m else c)
+        tab.row(cells)
+        if m == "residual_anchored" or m == M_CUBIC:
+            tab.rule()
+    if zero_std_used:
+        tab.note(f"\"± 0\": std below {ZERO_STD_REL:g} of the mean (numerical noise; fixed test set and deterministic fit), not exactly zero.")
+    tab.note(f"SymGWR-T = degree-5 polynomial + nearest-reference Taylor surrogate; SymGWR-R = residual-anchored; SymGWR-R-CS = residual-anchored with a compactly supported "
+             f"blend of the k={K_SHOW} nearest reference residuals; cubic = interpolant along T (random, temp.-band) or along the composition arm (comp.-group).")
+    tab.note("Effective independent partitions: " + "; ".join(
+        f"{SPLIT_LABEL[s]} {eff[s][0]} ({eff[s][1]})" for s in SPLITS) + ".")
+    for m in rows:
+        if m in mark:
+            tab.note(f"({mark[m]}) {notes[letters.index(mark[m])]}")
+    try:
+        tab.note(_compgroup_note(only=set(rows) - {M_CUBIC}))
+    except FileNotFoundError:
+        tab.note(f"{SPLIT_LABEL['composition_group']}: no method is marked best (per-seed files for the paired fold test not found).")
+    return tab
+
 
 # ----------------------------------------------------------------------
 #  Table 2: derivative fidelity
@@ -571,17 +650,26 @@ def _ref_label(term, ref):
     return f"c±{m.group(1)}, T±{m.group(2)}"
 
 
+def _so_load():
+    """Second-order summaries of the polynomial on all grid points: (narrow FD indexed by term, reference ladder)."""
+    so, rf = rd("derivative_second_order_summary.csv"), rd("derivative_second_order_refs_summary.csv")
+    return (so[(so["estimator"] == "poly") & (so["subset"] == "all_grid")].set_index("term"),
+            rf[(rf["estimator"] == "poly") & (rf["subset"] == "all_grid")])
+
+
+def _verdict(share):
+    return "noise-limited" if share >= NOISE_DOMINATES else "model error" if share < MODEL_ERROR_BELOW else "mixed"
+
+
 def _second_order_block(tab):
     """Second derivatives (d2G/dT2, pure d2/dc2, mixed d2/dTdc): poly vs narrow FD and vs the best wide/spline reference.
     Narrow-FD columns: all FD-eligible grid points (derivative_second_order_summary.csv); the reference column is on the points
     common to the whole stencil ladder (derivative_second_order_refs_summary.csv).  Verdict from the narrow-FD noise share."""
     try:
-        so, rf = rd("derivative_second_order_summary.csv"), rd("derivative_second_order_refs_summary.csv")
+        so, rf = _so_load()
     except FileNotFoundError:
         tab.note("Second-order block not available (derivative_second_order*_summary.csv missing).")
         return
-    so = so[(so["estimator"] == "poly") & (so["subset"] == "all_grid")].set_index("term")
-    rf = rf[(rf["estimator"] == "poly") & (rf["subset"] == "all_grid")]
     tab.subhead(["Second derivative", "n (grid)", "vs narrow FD (%)", "vs best ref. (%)", "Noise share (%)", "Best ref.", "Verdict"])
     ncommon, spline_t = [], None
     for term, name in SECOND_TERMS:
@@ -591,7 +679,7 @@ def _second_order_block(tab):
         g = rf[rf["term"] == term].set_index("ref")
         cand = g[g.index.str.startswith("wide") | (g.index == "spline")]
         share = float(r["noise_sq_share_mean"])
-        verdict = "noise-limited" if share >= NOISE_DOMINATES else "model error" if share < MODEL_ERROR_BELOW else "mixed"
+        verdict = _verdict(share)
         narrow = mean_std(100 * r["normalized_error_mean"], 100 * r["normalized_error_std"])
         if term != "d2/dT2" and verdict == "noise-limited":
             narrow = T("noise-limited")   # a mixed T-c narrow-FD error that is mostly rounding noise is never shown
@@ -615,8 +703,66 @@ def _second_order_block(tab):
     if spline_t is not None:
         tab.note(f"d²G/dT²: error vs the smoothing spline {spline_t:.1f}% against {100 * so.loc['d2/dT2', 'normalized_error_mean']:.1f}% vs the narrow FD.")
 
+def _derivative_compact(res, ident, ranks, nterms, n_seeds):
+    """Compact Table 2: first derivatives per axis (n, normalized error, r) + the d2G/dT2 row; the rest of the second-order block in footnotes."""
+    so, rf = _so_load()
+    tab = Table("c_derivfid", "Derivative fidelity (compact)",
+                "Analytic gradient of the degree-5 SymGWR polynomial vs. central finite differences (FD) of the raw CALPHAD table on all grid points. "
+                f"Normalized error = MAE / typical |derivative|; r = Pearson correlation; mean ± std over {n_seeds} seeds (ddof=1).",
+                "lrrr", ["First derivative", "n", "Norm. err. (%)", "r"], wide=False, size="scriptsize")
+    for ax in AXES:
+        key = (ax, "all_grid", "poly")
+        name = f"dG/d{ax}" + (f" [{AXIS_UNIT[ax]}]" if ax in AXIS_UNIT else "")
+        if key not in res:
+            tab.row([T(name), C(EM), C(EM), C(EM)])
+            continue
+        a = res[key]
+        tab.row([T(name), intc(a["n"]), mean_std(*a["err"], sig=3), num(a["r"][0], 4)])
+    # d2G/dT2: narrow FD vs best reference
+    term = "d2/dT2"
+    r = so.loc[term]
+    g = rf[rf["term"] == term].set_index("ref")
+    cand = g[g.index.str.startswith("wide") | (g.index == "spline")]
+    b = cand["normalized_error_mean"].idxmin()
+    tab.subhead(["Second derivative", "n", "vs narrow FD (%)", "vs best ref. (%)"])
+    tab.row([T("d²G/dT²"), intc(r["n_mean"]), mean_std(100 * r["normalized_error_mean"], 100 * r["normalized_error_std"]),
+             mean_std(100 * cand.loc[b, "normalized_error_mean"], 100 * cand.loc[b, "normalized_error_std"])])
+    share_t = float(r["noise_sq_share_mean"])
 
-def table_derivative():
+    # footnote numbers, all computed
+    pure = {a: so.loc[f"d2/d{a}2"] for a in AXES if a != "T" and f"d2/d{a}2" in so.index}
+    def pure_errs(axes):
+        out = []
+        for a in axes:
+            gg = rf[rf["term"] == f"d2/d{a}2"].set_index("ref")
+            cc = gg[gg.index.str.startswith("wide")]
+            out += [100 * pure[a]["normalized_error_mean"], 100 * cc["normalized_error_mean"].min()]
+        return out
+    worst = sorted(pure, key=lambda a: pure[a]["normalized_error_mean"])[-2:]   # the two axes with the largest model error
+    rest = [a for a in pure if a not in worst]
+    e_w, e_r = pure_errs(worst), pure_errs(rest)
+    assert all(_verdict(float(pure[a]["noise_sq_share_mean"])) == "model error" for a in pure), "pure d2/dc2 verdicts changed"
+    mixed = {a: _verdict(float(so.loc[f"d2/dTd{a}", "noise_sq_share_mean"])) for a in AXES if a != "T" and f"d2/dTd{a}" in so.index}
+    n_noise = sum(v == "noise-limited" for v in mixed.values())
+    d2 = ident[ident["order"] == 2]
+    own2 = d2[d2.apply(lambda r_: bool(re.fullmatch(r"d2/d(\w+?)2|d2/d(\w+?)dT", r_["derivative"])), axis=1)]
+    cross2 = d2.drop(own2.index)
+    d1 = ident[ident["derivative"].str.fullmatch(r"d/d(?!T$|Ni$)\w+") & (ident["evaluated_at"] != ident["derivative"].str.replace("d/d", "") + "-plane")]
+    d1_ni = ident[ident["derivative"] == "d/dNi"]
+    tab.note(f"Fit design rank {', '.join(str(int(x)) for x in sorted(ranks))} of {', '.join(str(int(x)) for x in sorted(nterms))} polynomial terms; "
+             "composition-axis accuracy holds for own-axis derivatives on the sweep lines only (identified there; "
+             f"other planes not identified, null share {d1['null_frac_mean'].min():.2f}–{d1['null_frac_mean'].max():.2f}). "
+             f"Ni is a constant column: no FD, not identifiable (null share {d1_ni['null_frac_mean'].min():.2f}).")
+    tab.note(f"d²G/dT²: the narrow FD (one grid step) is noise-limited (noise share {100 * share_t:.0f}% of its squared error, from the rounding of the table), "
+             f"so the error vs the best reference ({_ref_label(term, b)} wide-stencil FD or smoothing spline) is the one to read.")
+    tab.note(f"Pure d²G/dc² for {' and '.join(worst)}: model error {min(e_w):.0f}–{max(e_w):.0f}% (other axes {min(e_r):.0f}–{max(e_r):.0f}%). "
+             f"Mixed d²G/dT dc: noise-limited in the narrow FD for {n_noise} of {len(mixed)} axes (not tabulated). "
+             f"Cross-element mixed terms ({cross2['derivative'].nunique()}) are not identified (null share "
+             f"{_fmt_null(cross2['null_frac_mean'].min(), cross2['null_frac_max'].max())}) and have no FD reference.")
+    return tab
+
+
+def table_derivative(compact=False):
     fid = rd("derivative_fidelity.csv")
     ident = rd("derivative_identifiability.csv")
     n_seeds = fid["seed"].nunique()
@@ -648,6 +794,9 @@ def table_derivative():
             lo, hi = oth["null_frac_mean"].min(), oth["null_frac_mean"].max()
             parts.append(("other planes: not identified" if lo >= NOT_IDENT else "other planes: partly") + f" (null {_fmt_null(lo, hi)})")
         return "; ".join(parts)
+
+    if compact:
+        return _derivative_compact(res, ident, ranks, nterms, n_seeds)
 
     tab = Table("derivfid", "Derivative fidelity of the degree-5 SymGWR polynomial vs. central finite differences",
                 "Analytic polynomial gradient vs. central finite differences of the raw CALPHAD table (all grid points, and held-out test points only; second-derivative block below). "
@@ -695,8 +844,37 @@ def _cont_cols(df):
 
 EVENT_LABEL = {"nearest_ref_switch": "NN switch", "kset_change": "k-set", "support_ref_change": "support"}
 
+def _continuity_compact(short, pshort, extra, nseg, nseeds):
+    """Compact Table 3: nearest-reference-switch events only, SymGWR-T / -R / -R-CS, short segments, three splits."""
+    assert "residual_anchored_cs" in extra, "compact continuity needs ridwcs_continuity_*.csv"
+    cs_sum, cs_per, _ = extra["residual_anchored_cs"]
+    cols_t, cols_cs = _cont_cols(short), _cont_cols(cs_sum)
+    pick = lambda cols: [cols[0], cols[1], cols[3]]   # value jump median, p95; gradient jump median
+    tab = Table("c_continuity", "Continuity at nearest-reference switches (compact)",
+                f"Jump of the surrogate when the nearest reference changes, on {nseg:,} short segments per split and seed ({nseeds} seeds); "
+                "median and p95 averaged over seeds. Value jump in J/mol; gradient jump relative to the median model gradient norm.",
+                "lrrr", ["Variant", "Value, median", "Value, p95", "Gradient, median"], wide=False, size="scriptsize")
+    for s_ in SPLITS:
+        if s_ != SPLITS[0]:
+            tab.rule()
+        tab.section(f"{SPLIT_LABEL[s_]} split")
+        for v, lab_ in (("SymGWR", "SymGWR-T"), ("residual_anchored", "SymGWR-R"), ("residual_anchored_cs", f"SymGWR-R-CS (k={K_SHOW})")):
+            if v in extra:
+                r = cs_sum[(cs_sum["split"] == s_) & (cs_sum["event"] == "nearest_ref_switch")]
+                cols = cols_cs
+            else:
+                r = short[(short["split"] == s_) & (short["variant"] == v)]
+                cols = cols_t
+            assert len(r) == 1, f"compact continuity: {v}/{s_} has {len(r)} rows"
+            r = r.iloc[0]
+            tab.row([T(lab_)] + [num(r[c]) for c in pick(cols)])
+    tab.note("NN switch = the nearest reference changes. SymGWR-T extrapolates linearly from the nearest reference, so value and gradient both jump. "
+             "SymGWR-R adds a constant offset to the polynomial, so its gradient is continuous (jumps are zero up to rounding) and only the value jumps. "
+             f"SymGWR-R-CS (k={K_SHOW}) blends the residuals of the k nearest references with compact support; its jumps at NN switches are small in value and gradient.")
+    return tab
 
-def table_continuity():
+
+def table_continuity(compact=False):
     summ = rd("continuity_summary.csv")
     per = rd("continuity_per_seed.csv")
     short = summ[summ["segment_type"] == "short"]
@@ -721,6 +899,9 @@ def table_continuity():
         pass
     extra_label = {"residual_anchored_idw": f"SymGWR-R-IDW (k={K_SHOW})", "residual_anchored_cs": f"SymGWR-R-CS (k={K_SHOW})"}
     variants = ["SymGWR", "residual_anchored", "residual_anchored_idw", "residual_anchored_cs"]
+
+    if compact:
+        return _continuity_compact(short, pshort, extra, nseg, nseeds)
 
     tab = Table("continuity", "Continuity of the nearest-reference surrogates on short segments",
                 "", "llrrrrrrr",
@@ -871,8 +1052,41 @@ def _pending_scaling(msg):
     tab.note(f"Generated automatically once {', '.join(SCALING_FILES)} exist in {IN_DIR}/.")
     return [tab]
 
+COMPACT_SCALING = [("SymGWR-T", "SymGWR-T"), ("SymGWR-R", "SymGWR-R"), ("Spline_scipy", "Cubic spline")]
 
-def table_scaling():
+
+def _scaling_compact(q, slopes, qm, env, sizes, nreal, nrep):
+    """Compact Table 5: mean query time vs n for SymGWR-T/-R and the cubic spline, slopes row, pycalphad speedup footnote."""
+    tab = Table("c_scaling", "Query time vs. number of reference points (compact)",
+                f"Mean per-query latency (µs) over {int(q['n_queries'].iloc[0]):,} timed queries, averaged over {nrep} repeats. "
+                "Last row: log-log slope of query time against n with 95% CI (slope 0 = constant time).",
+                "lrrr", ["n"] + [h for _, h in COMPACT_SCALING], wide=False, size="scriptsize")
+    for nl in sizes:
+        tab.row([T(_scaling_row_label(nl, nreal))] + [num(qm.loc[(nl, m), "mean_us"]) for m, _ in COMPACT_SCALING])
+    tab.rule()
+    srow = [T("Slope [95% CI]")]
+    for m, _ in COMPACT_SCALING:
+        r = slopes[(slopes["method"] == m) & (slopes["stat"] == "mean_us")]
+        srow.append(T(f"{r['slope'].iloc[0]:.2f} [{r['ci95_lo'].iloc[0]:.2f}, {r['ci95_hi'].iloc[0]:.2f}]") if len(r) else C(EM))
+    tab.row(srow)
+    nsz = q["n"].nunique()
+    tab.note(f"Sizes above {nreal:,} are tiled copies of the real reference points with {100 * float(env['jitter_frac_of_std']):g}% jitter: they test index (KD-tree) "
+             f"behaviour, not accuracy. n = {nreal:,} is the real fit. The slope rests on {nsz} distinct sizes × {nrep} repeats. "
+             f"Timing: process pinned to core {env['pinned_core']}, OMP_NUM_THREADS={env['OMP_NUM_THREADS']}, GC {env['gc_during_timing']} while timing; cubic spline = scipy.")
+    pth = os.path.join(IN_DIR, "..", PYCALPHAD[0][0])
+    if os.path.exists(pth):
+        pc = pd.read_csv(pth)
+        ms = float(pc["latency_ms"].mean())
+        real_us = {m: qm.loc[("real", m), "mean_us"] for m in ("SymGWR-T", "SymGWR-R")}
+        tab.note(f"Speedup vs pycalphad {PYCALPHAD[0][1]}: mean latency {ms:.4g} ms over {len(pc)} queries, i.e. {sci(ms * 1e3 / real_us['SymGWR-T'])}× SymGWR-T and "
+                 f"{sci(ms * 1e3 / real_us['SymGWR-R'])}× SymGWR-R at n = {nreal:,}. The pycalphad database is a steel database, not the system SymGWR is fitted to, "
+                 "and pycalphad was timed in a separate run: orders of magnitude only.")
+    else:
+        tab.note(f"pycalphad timing ({PYCALPHAD[0][0]}) not available.")
+    return tab
+
+
+def table_scaling(compact=False):
     paths = {f: os.path.join(IN_DIR, f) for f in SCALING_FILES}
     miss = [f for f, p_ in paths.items() if not os.path.exists(p_)]
     if miss:
@@ -892,6 +1106,9 @@ def table_scaling():
     sizes = [n for n in SCALING_N if n in set(q["n_label"])]
     nrep = q["rep"].nunique()
     qm = q.groupby(["n_label", "method"])[["mean_us", "p99_us"]].mean()      # mean over repeats
+
+    if compact:
+        return [_scaling_compact(q, slopes, qm, env, sizes, nreal, nrep)]
 
     # ---- Table 5: query time
     head = ["n"] + [h for _, h in QUERY_METHODS] + [dict(QUERY_METHODS)[m] for m in P99_METHODS]
@@ -982,8 +1199,32 @@ NEWTON_ROWS = [("reference", "Reference (truth)", None), ("Polynomial", "Polynom
                ("SymGWR-R-IDW", f"SymGWR-R-IDW (k={K_SHOW})", None), ("SymGWR-R-CS", f"SymGWR-R-CS (k={K_SHOW})", None)]
 NEWTON_PROTO = {"random": "Random", "temp_band": "Temp.-band", "n/a": EM}
 
+NEWTON_COMPACT = [("reference", "Reference (truth)"), ("Polynomial", "Polynomial"), ("SymGWR-R", "SymGWR-R"), ("SymGWR-T", "SymGWR-T (Newton)"),
+                  ("Spline_train", "Spline (train rows)"), ("Spline_full_raw", "Spline (full raw table)"),
+                  ("SymGWR-R-IDW", f"SymGWR-R-IDW (k={K_SHOW})"), ("SymGWR-R-CS", f"SymGWR-R-CS (k={K_SHOW})")]
 
-def table_newton():
+
+def _newton_compact(sm, nref, nsteps, nseed, nrun, cap):
+    """Compact Table 7: Newton solver rows only; convergence, iterations and escapes."""
+    tab = Table("c_newton", "Newton test (compact)",
+                f"Implicit cooling of one lumped body per composition ({nref} compositions, {nsteps} steps) with each surrogate's analytic Jacobian "
+                f"dH/dT = −T d²G/dT²; mean over {nseed} seeds × {nref} compositions ({nrun} runs) per surrogate and protocol. "
+                f"Converged = every step reaches |R| < tol within {cap} iterations; escaped = the accepted temperature left the data window.",
+                "llrrr", ["Surrogate", "Protocol", "Converged (%)", "Mean iters", "Escaped (%)"], wide=False, size="scriptsize")
+    for sur, lab in NEWTON_COMPACT:
+        d = sm[sm["surrogate"] == sur]
+        assert len(d), f"compact Newton: surrogate {sur} missing"
+        for _, r in d.iterrows():
+            if r["protocol"] not in NEWTON_PROTO:
+                continue
+            tab.row([T(lab), T(NEWTON_PROTO[r["protocol"]]), num(r["converged_pct"]), num(r["iters_mean"]), num(r["escaped_pct"])])
+    tab.note("Truth = degree-4 smoothing spline of G (the raw table is rounded, so second derivatives of an interpolating spline are quantisation noise). "
+             f"Reference and full-raw-spline rows run once per composition ({nref} runs, no protocol). "
+             "Spline (train rows) = cubic spline along T through the fit rows of the composition. Secant and Brent solvers for SymGWR-T are not shown.")
+    return tab
+
+
+def table_newton(compact=False):
     path_s, path_r = os.path.join(IN_DIR, "newton_summary.csv"), os.path.join(IN_DIR, "newton_runs.csv")
     tab = Table("newton", "Newton–Raphson test of the surrogates' analytic Jacobians (0-D implicit cooling)",
                 "", "llrrrrp{3.4cm}", ["Surrogate", "Protocol", "Converged (%)", "Mean iters", "Escaped (%)", "Max ΔT (K): median (max)", "Note"],
@@ -1005,6 +1246,9 @@ def table_newton():
                    f"H = G − T dG/dT and its Jacobian dH/dT = −T d²G/dT². Mean over {nseed} seeds × {nref} compositions ({nrun} runs) per surrogate and protocol. "
                    "Converged = every step reaches |R| < tol within the iteration cap; escaped = the accepted temperature left the data window; "
                    "Max ΔT = largest temperature error against the truth along a run.")
+    if compact:
+        return _newton_compact(sm, nref, nsteps, nseed, nrun, cap)
+
     for sur, lab, note in NEWTON_ROWS:
         for _, r in sm[sm["surrogate"] == sur].iterrows():
             if r["protocol"] not in NEWTON_PROTO:
@@ -1030,24 +1274,32 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--in-dir", default=IN_DIR)
     ap.add_argument("--out-dir", default=None, help="defaults to --in-dir")
+    ap.add_argument("--compact", action="store_true",
+                    help="write paper_tables_compact.{md,tex} (5 condensed tables) instead of the full paper_tables.{md,tex}")
     args = ap.parse_args()
     IN_DIR = args.in_dir
     out_dir = args.out_dir or IN_DIR
     os.makedirs(out_dir, exist_ok=True)
 
-    builders = [table_accuracy, table_derivative, table_continuity, table_design, table_scaling, table_newton]
+    if args.compact:
+        builders = [lambda: table_accuracy(compact=True), lambda: table_derivative(compact=True), lambda: table_continuity(compact=True),
+                    lambda: table_newton(compact=True), lambda: table_scaling(compact=True)]
+        stem, what = "paper_tables_compact", " (compact)"
+    else:
+        builders = [table_accuracy, table_derivative, table_continuity, table_design, table_scaling, table_newton]
+        stem, what = "paper_tables", ""
     tables = []
     for b in builders:
         r_ = b()
         tables += r_ if isinstance(r_, list) else [r_]
-    md = ["# Camera-ready paper tables", "",
+    md = [f"# Camera-ready paper tables{what}", "",
           f"Generated by `experiments/export_paper_tables.py` from `{IN_DIR}/*.csv` (+ `design_audit.json`). Do not edit by hand.", ""]
     tex = ["% Generated by experiments/export_paper_tables.py -- do not edit by hand.",
            "% Requires \\usepackage{booktabs}.  Wide tables use table* (IEEEtran two-column).", ""]
     for i, t in enumerate(tables, 1):
         md.append(render_md(t, i))
         tex.append(render_tex(t, i))
-    p_md, p_tex = (os.path.join(out_dir, f"paper_tables.{e}") for e in ("md", "tex"))
+    p_md, p_tex = (os.path.join(out_dir, f"{stem}.{e}") for e in ("md", "tex"))
     with open(p_md, "w") as f:
         f.write("\n".join(md))
     with open(p_tex, "w") as f:
