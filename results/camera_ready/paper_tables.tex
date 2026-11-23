@@ -4,10 +4,11 @@
 % ---- Table 1: Main accuracy
 \begin{table*}[t]
 \centering
-\caption{Test accuracy on the three CALPHAD splits: mean $\pm$ std over seeds (std with ddof=1). MAPE is the raw-unit MAPE in percent; R$^2$ is reported as 1$-$R$^2$. Bold = best mean per split and metric.}
+\caption{Test accuracy on the three CALPHAD splits: mean $\pm$ std over seeds (std with ddof=1). MAPE is the raw-unit MAPE in percent; R$^2$ is reported as 1$-$R$^2$. Bold = best mean per metric in the random and temp.-band splits (no ranking in the comp.-group split).}
 \label{tab:accuracy}
 \scriptsize
 \setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.9}
 \begin{tabular}{lrrrl}
 \toprule
 Method & RMSE (J/mol) & MAPE (\%) & $1-R^2$ & Note \\
@@ -58,11 +59,11 @@ SymGWR-T & $124 \pm 98$ & $0.0630 \pm 0.0336$ & $(4.72 \pm 8.79)\times10^{-5}$ &
 SymGWR-R & $60.0 \pm 64.3$ & $0.0322 \pm 0.0293$ & $(1.44 \pm 3.14)\times10^{-5}$ &  \\
 \midrule
 SymGWR-R-IDW (k=4) & $59.6 \pm 64.4$ & $0.0310 \pm 0.0293$ & $(1.44 \pm 3.14)\times10^{-5}$ &  \\
-SymGWR-R-CS (k=4) & $59.6 \pm 64.4$ & \textbf{$0.0304 \pm 0.0293$} & $(1.44 \pm 3.14)\times10^{-5}$ &  \\
+SymGWR-R-CS (k=4) & $59.6 \pm 64.4$ & $0.0304 \pm 0.0293$ & $(1.44 \pm 3.14)\times10^{-5}$ &  \\
 Cubic along T / arm & $3.34 \pm 2.36$ & $(1.47 \pm 0.90)\times10^{-3}$ & $(3.16 \pm 4.29)\times10^{-8}$ & a \\
 Linear & $1331 \pm 219$ & $1.14 \pm 0.12$ & $(3.49 \pm 1.08)\times10^{-3}$ &  \\
 Ridge & $1352 \pm 206$ & $1.15 \pm 0.12$ & $(3.59 \pm 1.04)\times10^{-3}$ &  \\
-Polynomial & \textbf{$53.3 \pm 17.9$} & $0.0380 \pm 0.0109$ & \textbf{$(6.06 \pm 4.06)\times10^{-6}$} &  \\
+Polynomial & $53.3 \pm 17.9$ & $0.0380 \pm 0.0109$ & $(6.06 \pm 4.06)\times10^{-6}$ &  \\
 k-NN & $635 \pm 270$ & $0.531 \pm 0.181$ & $(9.14 \pm 8.70)\times10^{-4}$ &  \\
 Decision tree & $704 \pm 260$ & $0.490 \pm 0.157$ & $(1.08 \pm 0.85)\times10^{-3}$ &  \\
 XGBoost & $928 \pm 423$ & $0.611 \pm 0.215$ & $(1.99 \pm 2.16)\times10^{-3}$ &  \\
@@ -82,10 +83,11 @@ SymGWR-R-IDW / SymGWR-R-CS (k=4) = residual-anchored polynomial plus an inverse-
 (i) Random: 10 random 60/20/20 resamples; test sets overlap, pairs not strictly independent\par
 (ii) Temp.-band: test set fixed (1,568 rows, same for every seed); only train/val partition varies\par
 (iii) Comp.-group: 5 folds x 2 shuffles: test fold = seed \% 5, so 5 distinct test sets, each seen twice\par
-(a) Comp.-group: cubic along the composition arm is defined for only 81\% of the test rows (composition bracketed by reference compositions on its arm; star-centre and out-of-range rows have no value). Its metrics are on those rows only, where SymGWR-T has MAPE 0.0434\% (all rows: 0.0630\%); it is therefore excluded from the bold best-of ranking in this split.\par
+(a) Comp.-group: cubic along the composition arm is defined for only 81\% of the test rows (composition bracketed by reference compositions on its arm; star-centre and out-of-range rows have no value). Its metrics are on those rows only, where SymGWR-T has MAPE 0.0434\% (all rows: 0.0630\%); the two sets of rows are not directly comparable.\par
 (b) train rows capped at 2500 (random subsample, seed-dependent); val rows added on refit\par
 (c) temperature column moved to index 0 before train\_pinn: the library physics loss penalises dG/d(feature 0), and feature 0 in the data is Mass\_fraction\_Nb\par
 (d) GP protocol: alpha tuned on a 1000-row train subsample (val MSE), then ONE refit on train (capped 2500) + val; 25 min timeout\par
+Comp.-group: no method is marked best; differences between methods are within the fold-to-fold variation (std over 5 effective independent partitions).\par
 Seeds per method: 10; timeouts: 0, errors: 0.\par
 \end{minipage}
 \end{table*}
@@ -93,13 +95,13 @@ Seeds per method: 10; timeouts: 0, errors: 0.\par
 % ---- Table 2: Derivative fidelity of the degree-5 SymGWR polynomial vs. central finite differences
 \begin{table*}[t]
 \centering
-\caption{Analytic polynomial gradient vs. central finite differences of the raw CALPHAD table (all grid points, and held-out test points only). Normalized error = MAE / typical \textbar{}dG/dx\textbar{}; r = Pearson correlation; mean $\pm$ std over 10 seeds (ddof=1). The identifiability column gives the share of the derivative functional lying in the null space of the design (null; \textasciitilde{}0 = determined by the data).}
+\caption{Analytic polynomial gradient vs. central finite differences of the raw CALPHAD table (all grid points, and held-out test points only; second-derivative block below). Normalized error = MAE / typical \textbar{}dG/dx\textbar{}; r = Pearson correlation; mean $\pm$ std over 10 seeds (ddof=1). The identifiability column gives the share of the derivative functional lying in the null space of the design (null; \textasciitilde{}0 = determined by the data).}
 \label{tab:derivfid}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{p{2.4cm}rrrrrp{4.4cm}}
 \toprule
-Axis & n (grid) & Norm. err. (\%) & r & n (test) & Norm. err., test (\%) & Identifiability (null share) \\
+First derivative & n (grid) & Norm. err. (\%) & r & n (test) & Norm. err., test (\%) & Identifiability (null share) \\
 \midrule
 dG/dT [J/(mol K)] & 7742 & $0.0531 \pm 0.0017$ & 0.9999 & 1549 & $0.0531 \pm 0.0024$ & identified on all 6 planes (null $\le$ 1.5e-13) \\
 dG/dNb & 1944 & $1.32 \pm 0.01$ & 0.9986 & 384 & $1.29 \pm 0.09$ & own plane: identified (null $\le$ 9.2e-13); other planes: not identified (null 0.74--0.92) \\
@@ -109,13 +111,32 @@ dG/dMo & 1539 & $3.81 \pm 0.01$ & 0.9978 & 307 & $3.86 \pm 0.20$ & own plane: id
 dG/dFe & 648 & $9.89 \pm 0.44$ & 0.9907 & 134 & $10.1 \pm 0.4$ & own plane: identified (null $\le$ 3.7e-13); other planes: not identified (null 0.77--0.96) \\
 dG/dCr & 729 & $2.77 \pm 0.10$ & 0.9868 & 149 & $2.71 \pm 0.13$ & own plane: identified (null $\le$ 4.1e-13); other planes: not identified (null 0.76--0.97) \\
 dG/dNi & — & — & — & — & — & not identifiable (constant column, no FD; null 1.00 on all 6 planes) \\
+\midrule
+Second derivative & n (grid) & vs narrow FD (\%) & vs best ref. (\%) & Noise share (\%) & Best ref. & Verdict \\
+\midrule
+d$^2$G/dT$^2$ & 7742 & $10.9 \pm 0.1$ & $2.59 \pm 0.10$ & 83 & T$\pm$5 & noise-limited \\
+d$^2$G/dNb$^2$ & 1944 & 18.1 $\pm$ 0.050 & $5.00 \pm 0.11$ & 0.11 & c$\pm$2 & model error \\
+d$^2$G/dAl$^2$ & 648 & $7.26 \pm 0.21$ & $6.77 \pm 0.19$ & 0.020 & c$\pm$2 & model error \\
+d$^2$G/dTi$^2$ & 1539 & $13.9 \pm 0.1$ & $5.67 \pm 0.05$ & 0.047 & c$\pm$3 & model error \\
+d$^2$G/dMo$^2$ & 1539 & 21.5 $\pm$ 0.027 & $5.75 \pm 0.22$ & 0.10 & c$\pm$2 & model error \\
+d$^2$G/dFe$^2$ & 648 & $41.8 \pm 1.9$ & $32.0 \pm 1.4$ & 1.4 & c$\pm$2 & model error \\
+d$^2$G/dCr$^2$ & 729 & $42.3 \pm 1.6$ & $38.4 \pm 1.4$ & 0.53 & c$\pm$3 & model error \\
+d$^2$G/dT dNb & 1896 & noise-limited & $3.71 \pm 0.23$ & 55 & c$\pm$3, T$\pm$5 & noise-limited \\
+d$^2$G/dT dAl & 632 & $12.7 \pm 0.2$ & $8.26 \pm 0.35$ & 1.5 & c$\pm$2, T$\pm$5 & model error \\
+d$^2$G/dT dTi & 1501 & $54.4 \pm 0.2$ & $30.4 \pm 0.2$ & 2.1 & c$\pm$3, T$\pm$5 & model error \\
+d$^2$G/dT dMo & 1501 & noise-limited & $1.95 \pm 0.15$ & 71 & c$\pm$3, T$\pm$5 & noise-limited \\
+d$^2$G/dT dFe & 632 & noise-limited & $5.56 \pm 0.75$ & 88 & c$\pm$2, T$\pm$5 & noise-limited \\
+d$^2$G/dT dCr & 711 & noise-limited & $6.33 \pm 1.05$ & 71 & c$\pm$3, T$\pm$5 & noise-limited \\
 \bottomrule
 \end{tabular}
 \par\smallskip
 \begin{minipage}{\linewidth}\scriptsize\raggedright
 Fit design rank 95 of 1286 polynomial terms (centred, bias-free), all 10 seeds; the minimum-norm solution sets the unconstrained part to zero.\par
 Composition-axis accuracy holds for own-axis derivatives on the sweep lines only; cross-element, Ni and interior-composition gradients are not identified by the data.\par
-Second derivatives: pure and d/dT-mixed on the own plane identified (null $\le$ 6.0e-13); cross-element mixed terms not identified (null 0.91--1.00).\par
+Not evaluated: the 30 cross-element mixed second derivatives (not identified, null share 0.91--1.00; the OFAT design gives no FD reference).\par
+Second-order block: normalized error = MAE / typical \textbar{}d$^2$G\textbar{}, mean $\pm$ std over seeds. The narrow FD is the second difference of the raw table over one grid step each side; the table is rounded (1 J/mol for \textbar{}G\textbar{} $\ge$ 1e5, 0.01 J/mol otherwise), which puts a noise floor scaling as 1/h$^2$ on it. Noise share = fraction of the squared error vs the narrow FD that this rounding noise accounts for (computed from the quantum of every stencil value, not fitted). Verdict: share $\ge$ 50\% noise-limited, $<$ 25\% model error.\par
+Best ref. = lowest error among the wide-stencil FD ladder and the degree-4 smoothing spline (d$^2$G/dT$^2$ only); $\pm$k = stencil half-width in grid steps in T and/or c. Its error is on the points where every ladder stencil exists (n = 284--6,958), so n differs from the n (grid) of the narrow-FD columns. Mixed T--c rows whose narrow-FD error is mostly noise show noise-limited instead of that error.\par
+d$^2$G/dT$^2$: error vs the smoothing spline 2.7\% against 10.9\% vs the narrow FD.\par
 Held-out = FD points whose centre row is not in that seed's train+val. A random row split keeps fit neighbours in the same (T, c) plane, so this is an interpolation test, not a held-out-composition test.\par
 \end{minipage}
 \end{table*}
@@ -252,5 +273,44 @@ n & Time (s) & $\mu$s/ref & MB & Time (s) & MB & SymGWR-T & SymGWR-R \\
 \begin{minipage}{\linewidth}\scriptsize\raggedright
 Gradients: gwr.gradients.evaluate\_polynomial\_pipeline\_gradients (explicit, no SymPy). SymGWR-T stores the gradient at every reference, SymGWR-R stores P at every reference. Storage in MB (1 MB = 2\textasciicircum{}20 B; gradient storage = n $\times$ 8 float64 values). Total = reference rows + gradient (T) or P(ref) (R) + measured KD-tree memory (RSS delta; noisy at small n).\par
 Sizes above 6,350 are tiled with 1\% jitter, as in Table 5.\par
+\end{minipage}
+\end{table*}
+
+% ---- Table 7: Newton–Raphson test of the surrogates' analytic Jacobians (0-D implicit cooling)
+\begin{table*}[t]
+\centering
+\caption{Implicit cooling of one lumped body per composition (98 compositions, 150 steps) solved with each surrogate's enthalpy H = G $-$ T dG/dT and its Jacobian dH/dT = $-$T d$^2$G/dT$^2$. Mean over 10 seeds $\times$ 98 compositions (980 runs) per surrogate and protocol. Converged = every step reaches \textbar{}R\textbar{} $<$ tol within the iteration cap; escaped = the accepted temperature left the data window; Max $\Delta$T = largest temperature error against the truth along a run.}
+\label{tab:newton}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llrrrrp{3.4cm}}
+\toprule
+Surrogate & Protocol & Converged (\%) & Mean iters & Escaped (\%) & Max $\Delta$T (K): median (max) & Note \\
+\midrule
+Reference (truth) & --- & 100 & 2.89 & 0 & — &  \\
+Polynomial & Random & 100 & 2.69 & 0 & 6.57 (24.2) &  \\
+Polynomial & Temp.-band & 100 & 2.69 & 0 & 6.37 (22.3) &  \\
+SymGWR-R & Random & 91.1 & 2.74 & 0 & 6.62 (24.6) &  \\
+SymGWR-R & Temp.-band & 93.9 & 2.75 & 0 & 6.42 (22.6) &  \\
+SymGWR-T, Newton & Random & 0 & 20.0 & 100 & 850 (850) &  \\
+SymGWR-T, Newton & Temp.-band & 0 & 20.0 & 100 & 850 (850) &  \\
+SymGWR-T, secant & Random & 0 & 19.8 & 98.4 & 802 (891) &  \\
+SymGWR-T, secant & Temp.-band & 0 & 20.0 & 100 & 779 (890) &  \\
+SymGWR-T, Brent & Random & 100 & 31.0 & 0 & 710 (740) & found a sign change (not \textbar{}R\textbar{}$<$tol) \\
+SymGWR-T, Brent & Temp.-band & 100 & 17.1 & 0 & 345 (345) & found a sign change (not \textbar{}R\textbar{}$<$tol) \\
+Spline (train rows) & Random & 75.2 & 3.65 & 17.8 & 6.98 (891) &  \\
+Spline (train rows) & Temp.-band & 56.1 & 4.11 & 27.6 & 7.94 (850) &  \\
+Spline (full raw table) & --- & 53.1 & 4.19 & 30.6 & 8.03 (850) &  \\
+SymGWR-R-IDW (k=4) & Random & 9.08 & 7.74 & 53.2 & 601 (891) &  \\
+SymGWR-R-IDW (k=4) & Temp.-band & 4.59 & 8.83 & 66.7 & 803 (883) &  \\
+SymGWR-R-CS (k=4) & Random & 8.78 & 7.84 & 56.2 & 704 (891) &  \\
+SymGWR-R-CS (k=4) & Temp.-band & 0.408 & 9.90 & 68.7 & 824 (883) &  \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\begin{minipage}{\linewidth}\scriptsize\raggedright
+0-D implicit cooling with a lumped body, not a phase-field simulation. The truth is a degree-4 smoothing spline of G, because the raw table is rounded (1 J/mol for \textbar{}G\textbar{} $\ge$ 1e5), so the second derivative of a spline interpolating it is quantisation noise. Reference and full-raw-spline rows run once per composition (98 runs, no protocol); the other rows are run per seed and protocol.\par
+Brent: converged = found a sign change (not \textbar{}R\textbar{}$<$tol), so it says nothing about the residual; its iterations are bracketing iterations, not Newton iterations. Newton and secant: at most 20 iterations per step.\par
+Spline (train rows) = cubic spline along T through the fit rows of the composition; Spline (full raw table) = cubic spline of the full raw table, run against the smooth truth. --- = not defined (no protocol; the reference has zero error by construction).\par
 \end{minipage}
 \end{table*}

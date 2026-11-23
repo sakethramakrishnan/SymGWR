@@ -7,10 +7,13 @@ number is read or computed from those files; nothing is typed in by hand.
 
 Tables
   1  main accuracy: methods x splits (RMSE, MAPE, 1-R2; mean +/- std over seeds)
-  2  derivative fidelity per axis, with identifiability notes
+  2  derivative fidelity per axis, with identifiability notes + second-order block (model error vs FD noise)
   3  continuity of the reference-based surrogates (short segments; SymGWR-T/R, R-IDW and R-CS at k=4)
   4  design audit (rows, compositions, rank, condition number, duplicate leakage)
-  5  scaling (rendered once results/camera_ready/scaling*.csv exists)
+  5  query time vs n (scaling_query_timing/_slopes/_env.csv) + pycalphad speedup line
+  6  gradient precompute time and storage vs n (scaling_runs.csv)
+     (both show \"pending\" until the scaling_*.csv files exist)
+  7  0-D implicit-cooling Newton test (newton_summary.csv)
 
 Quantities that are not in the inputs (a missing input CSV) are rendered as an
 explicit "not available" / "pending" row, never invented.
@@ -33,6 +36,7 @@ import pandas as pd
 
 IN_DIR = "results/camera_ready"
 SPLITS = ["random", "temp_band", "composition_group"]
+NO_RANK = {"composition_group"}   # splits where Table 1 does not bold a best method (differences within fold variation)
 SPLIT_LABEL = {"random": "Random", "temp_band": "Temp.-band", "composition_group": "Comp.-group"}
 # CSV variant name -> paper name
 VARIANT_LABEL = {"SymGWR": "SymGWR-T", "residual_anchored": "SymGWR-R", "residual_anchored_idw": "SymGWR-R-IDW"}
@@ -57,14 +61,14 @@ class C:
 
 
 _TEX_ESC = {"|": r"\textbar{}", "\\": r"\textbackslash{}", "&": r"\&", "%": r"\%", "$": r"\$", "#": r"\#",
-            "_": r"\_", "{": r"\{", "}": r"\}", "~": r"\textasciitilde{}", "^": r"\textasciicircum{}"}
+            "_": r"\_", "{": r"\{", "}": r"\}", "~": r"\textasciitilde{}", "^": r"\textasciicircum{}", "<": r"$<$", ">": r"$>$"}
 _SUP = str.maketrans("0123456789-", "⁰¹²³⁴⁵⁶⁷⁸⁹⁻")
 
 
 def tex_esc(s):
     return "".join(_TEX_ESC.get(ch, ch) for ch in s).replace("—", "---").replace("≤", r"$\le$") \
         .replace("±", r"$\pm$").replace("−", "$-$").replace("≥", r"$\ge$") \
-        .replace("–", "--").replace("×", r"$\times$").replace("²", r"$^2$")
+        .replace("–", "--").replace("×", r"$\times$").replace("²", r"$^2$").replace("µ", r"$\mu$").replace("→", r"$\rightarrow$").replace("Δ", r"$\Delta$")
 
 
 def md_esc(s):
@@ -153,10 +157,10 @@ def intc(x):
 #  Table container + renderers
 # ----------------------------------------------------------------------
 class Table:
-    def __init__(self, key, title, caption, align, header, groups=None, wide=False, size="footnotesize"):
+    def __init__(self, key, title, caption, align, header, groups=None, wide=False, size="footnotesize", stretch=None):
         self.key, self.title, self.caption = key, title, caption
         self.align, self.header, self.groups = align, header, groups  # groups: [(label, span)]
-        self.rows, self.notes, self.wide, self.size = [], [], wide, size
+        self.rows, self.notes, self.wide, self.size, self.stretch = [], [], wide, size, stretch
 
     def row(self, cells):
         self.rows.append([cell(c) for c in cells])
@@ -166,6 +170,10 @@ class Table:
 
     def section(self, label):
         self.rows.append(("SECTION", label))
+
+    def subhead(self, cells):
+        """Column headings of a second block inside the same tabular (same number of columns)."""
+        self.rows.append(("SUBHEAD", [str(c) for c in cells]))
 
     def note(self, s):
         self.notes.append(s)
@@ -190,6 +198,9 @@ def render_md(t, num_):
     for r in t.rows:
         if r == "RULE":
             continue
+        if isinstance(r, tuple) and r[0] == "SUBHEAD":
+            out.append("| " + " | ".join(f"**{md_esc(h)}**" for h in r[1]) + " |")
+            continue
         if isinstance(r, tuple):
             out.append("| " + " | ".join([f"**{md_esc(r[1])}**"] + [""] * (ncol - 1)) + " |")
             continue
@@ -213,7 +224,8 @@ def render_tex(t, num_):
     env = "table*" if t.wide else "table"
     ncol = len(t.header)
     L = [f"% ---- Table {num_}: {t.title}", f"\\begin{{{env}}}[t]", "\\centering", f"\\caption{{{tex_esc_caption(t.caption)}}}",
-         f"\\label{{tab:{t.key}}}", f"\\{t.size}", "\\setlength{\\tabcolsep}{3pt}", f"\\begin{{tabular}}{{{_tex_align(t)}}}", "\\toprule"]
+         f"\\label{{tab:{t.key}}}", f"\\{t.size}", "\\setlength{\\tabcolsep}{3pt}",
+         *([f"\\renewcommand{{\\arraystretch}}{{{t.stretch}}}"] if t.stretch else []), f"\\begin{{tabular}}{{{_tex_align(t)}}}", "\\toprule"]
     if t.groups:
         parts, cm, col = [], [], 1
         for lab, span in t.groups:
@@ -232,6 +244,10 @@ def render_tex(t, num_):
     L.append("\\midrule")
     for r in t.rows:
         if r == "RULE":
+            L.append("\\midrule")
+        elif isinstance(r, tuple) and r[0] == "SUBHEAD":
+            L.append("\\midrule")
+            L.append(" & ".join(tex_esc(h) if not h.startswith("$") else h for h in r[1]) + r" \\")
             L.append("\\midrule")
         elif isinstance(r, tuple):
             L.append(f"\\multicolumn{{{ncol}}}{{l}}{{\\textit{{{tex_esc(r[1])}}}}} \\\\")
@@ -365,7 +381,7 @@ def table_accuracy():
                 f"{SPLIT_LABEL[s]}: cubic along the composition arm is defined for only {100 * cov_arm[s]:.0f}% of the test rows "
                 "(composition bracketed by reference compositions on its arm; star-centre and out-of-range rows have no value). "
                 f"Its metrics are on those rows only, where SymGWR-T has MAPE {same_rows[s]:.4f}% (all rows: "
-                f"{stats[('SymGWR', s)]['mape'][0]:.4f}%); it is therefore excluded from the bold best-of ranking in this split.")
+                f"{stats[('SymGWR', s)]['mape'][0]:.4f}%); the two sets of rows are not directly comparable.")
     for m in order:
         for s in SPLITS:
             n_ = stats.get((m, s), {}).get("note")
@@ -384,11 +400,13 @@ def table_accuracy():
 
     tab = Table("accuracy", "Main accuracy",
                 "Test accuracy on the three CALPHAD splits: mean ± std over seeds (std with ddof=1). "
-                "MAPE is the raw-unit MAPE in percent; R² is reported as 1−R². Bold = best mean per split and metric.",
-                "lrrrl", ["Method", "RMSE (J/mol)", "MAPE (%)", "$1-R^2$", "Note"], size="scriptsize", wide=True)
+                "MAPE is the raw-unit MAPE in percent; R² is reported as 1−R². Bold = best mean per metric in the random and temp.-band splits (no ranking in the comp.-group split).",
+                "lrrrl", ["Method", "RMSE (J/mol)", "MAPE (%)", "$1-R^2$", "Note"], size="scriptsize", wide=True, stretch=0.9)  # 0.9: the long table must fit one page
 
     best = {}
     for s in SPLITS:
+        if s in NO_RANK:
+            continue
         for k in ("rmse", "mape", "omr2"):
             vals = {m: stats[(m, s)][k][0] for m in order if (m, s) in stats and not (m == M_CUBIC and s in partial)}
             best[(s, k)] = min(vals, key=vals.get)
@@ -403,7 +421,7 @@ def table_accuracy():
                     cells.append(C(EM))
                     continue
                 c = mean_std(*st[k])
-                cells.append(bold(c) if best[(s, k)] == m else c)
+                cells.append(bold(c) if best.get((s, k)) == m else c)
             marks = []
             if st:
                 if st["note"]:
@@ -428,6 +446,10 @@ def table_accuracy():
         tab.note(f"({roman[s]}) {SPLIT_LABEL[s]}: {eff[s][1]}")
     for n_ in note_list:
         tab.note(f"({note_mark[n_]}) {n_}")
+    for s in SPLITS:
+        if s in NO_RANK:
+            tab.note(f"{SPLIT_LABEL[s]}: no method is marked best; differences between methods are within the fold-to-fold variation "
+                     f"(std over {eff[s][0]} effective independent partitions).")
     tab.note(f"Seeds per method: {', '.join(map(str, n_seeds))}; timeouts: {sum(v['nto'] for v in stats.values())}, "
              f"errors: {sum(v['ner'] for v in stats.values())}.")
     return tab
@@ -447,6 +469,68 @@ def ub(x):
 
 def _fmt_null(lo, hi):
     return f"{lo:.2f}" if f"{lo:.2f}" == f"{hi:.2f}" else f"{lo:.2f}–{hi:.2f}"
+
+
+NOISE_DOMINATES = 0.5   # noise share of the squared error >= this -> noise-limited (mirrors run_calphad_grid_fd_gradient.py)
+MODEL_ERROR_BELOW = 0.25   # < this -> model error; in between -> mixed
+SECOND_TERMS = ([("d2/dT2", "d²G/dT²")] + [(f"d2/d{a}2", f"d²G/d{a}²") for a in AXES if a != "T"]
+                + [(f"d2/dTd{a}", f"d²G/dT d{a}") for a in AXES if a != "T"])
+
+
+def _ref_label(term, ref):
+    """wide_m5 -> T±5 / c±2 (half-width in grid steps); wide_c3_T5 -> c±3, T±5."""
+    if ref == "spline":
+        return "spline"
+    m = re.fullmatch(r"wide_m(\d+)", ref)
+    if m:
+        return ("T±" if term == "d2/dT2" else "c±") + m.group(1)
+    m = re.fullmatch(r"wide_c(\d+)_T(\d+)", ref)
+    return f"c±{m.group(1)}, T±{m.group(2)}"
+
+
+def _second_order_block(tab):
+    """Second derivatives (d2G/dT2, pure d2/dc2, mixed d2/dTdc): poly vs narrow FD and vs the best wide/spline reference.
+    Narrow-FD columns: all FD-eligible grid points (derivative_second_order_summary.csv); the reference column is on the points
+    common to the whole stencil ladder (derivative_second_order_refs_summary.csv).  Verdict from the narrow-FD noise share."""
+    try:
+        so, rf = rd("derivative_second_order_summary.csv"), rd("derivative_second_order_refs_summary.csv")
+    except FileNotFoundError:
+        tab.note("Second-order block not available (derivative_second_order*_summary.csv missing).")
+        return
+    so = so[(so["estimator"] == "poly") & (so["subset"] == "all_grid")].set_index("term")
+    rf = rf[(rf["estimator"] == "poly") & (rf["subset"] == "all_grid")]
+    tab.subhead(["Second derivative", "n (grid)", "vs narrow FD (%)", "vs best ref. (%)", "Noise share (%)", "Best ref.", "Verdict"])
+    ncommon, spline_t = [], None
+    for term, name in SECOND_TERMS:
+        if term not in so.index:
+            continue
+        r = so.loc[term]
+        g = rf[rf["term"] == term].set_index("ref")
+        cand = g[g.index.str.startswith("wide") | (g.index == "spline")]
+        share = float(r["noise_sq_share_mean"])
+        verdict = "noise-limited" if share >= NOISE_DOMINATES else "model error" if share < MODEL_ERROR_BELOW else "mixed"
+        narrow = mean_std(100 * r["normalized_error_mean"], 100 * r["normalized_error_std"])
+        if term != "d2/dT2" and verdict == "noise-limited":
+            narrow = T("noise-limited")   # a mixed T-c narrow-FD error that is mostly rounding noise is never shown
+        if len(cand):
+            b = cand["normalized_error_mean"].idxmin()
+            best, lab = mean_std(100 * cand.loc[b, "normalized_error_mean"], 100 * cand.loc[b, "normalized_error_std"]), _ref_label(term, b)
+            ncommon.append(int(g.loc["narrow", "n_mean"]))
+        else:
+            best, lab = C(EM), EM
+        if term == "d2/dT2" and "spline" in g.index:
+            spline_t = 100 * g.loc["spline", "normalized_error_mean"]
+        tab.row([T(name), intc(r["n_mean"]), narrow, best, num(100 * share, 2), T(lab), T(verdict)])
+    tab.note(f"Second-order block: normalized error = MAE / typical |d²G|, mean ± std over seeds. The narrow FD is the second difference of the raw table over one grid step each side; "
+             "the table is rounded (1 J/mol for |G| ≥ 1e5, 0.01 J/mol otherwise), which puts a noise floor scaling as 1/h² on it. "
+             "Noise share = fraction of the squared error vs the narrow FD that this rounding noise accounts for (computed from the quantum of every stencil value, not fitted). "
+             f"Verdict: share ≥ {100 * NOISE_DOMINATES:.0f}% noise-limited, < {100 * MODEL_ERROR_BELOW:.0f}% model error.")
+    if ncommon:
+        tab.note("Best ref. = lowest error among the wide-stencil FD ladder and the degree-4 smoothing spline (d²G/dT² only); ±k = stencil half-width in grid steps in T and/or c. "
+                 f"Its error is on the points where every ladder stencil exists (n = {min(ncommon):,}–{max(ncommon):,}), so n differs from the n (grid) of the narrow-FD columns. "
+                 "Mixed T–c rows whose narrow-FD error is mostly noise show noise-limited instead of that error.")
+    if spline_t is not None:
+        tab.note(f"d²G/dT²: error vs the smoothing spline {spline_t:.1f}% against {100 * so.loc['d2/dT2', 'normalized_error_mean']:.1f}% vs the narrow FD.")
 
 
 def table_derivative():
@@ -483,11 +567,11 @@ def table_derivative():
         return "; ".join(parts)
 
     tab = Table("derivfid", "Derivative fidelity of the degree-5 SymGWR polynomial vs. central finite differences",
-                "Analytic polynomial gradient vs. central finite differences of the raw CALPHAD table (all grid points, and held-out test points only). "
+                "Analytic polynomial gradient vs. central finite differences of the raw CALPHAD table (all grid points, and held-out test points only; second-derivative block below). "
                 f"Normalized error = MAE / typical |dG/dx|; r = Pearson correlation; mean ± std over {n_seeds} seeds (ddof=1). "
                 "The identifiability column gives the share of the derivative functional lying in the null space of the design (null; ~0 = determined by the data).",
                 "p{2.4cm}rrrrrp{4.4cm}",
-                ["Axis", "n (grid)", "Norm. err. (%)", "r", "n (test)", "Norm. err., test (%)", "Identifiability (null share)"],
+                ["First derivative", "n (grid)", "Norm. err. (%)", "r", "n (test)", "Norm. err., test (%)", "Identifiability (null share)"],
                 wide=True)
     for ax in AXES:
         key = (ax, "all_grid", "poly")
@@ -508,8 +592,9 @@ def table_derivative():
     tab.note(f"Fit design rank {rk} of {nt} polynomial terms (centred, bias-free), all {n_seeds} seeds; the minimum-norm solution sets the unconstrained part to zero.")
     tab.note("Composition-axis accuracy holds for own-axis derivatives on the sweep lines only; cross-element, Ni and interior-composition gradients are not identified by the data.")
     if len(own2) and len(cross2):
-        tab.note(f"Second derivatives: pure and d/dT-mixed on the own plane identified (null ≤ {ub(own2['null_frac_max'].max())}); "
-                 f"cross-element mixed terms not identified (null {_fmt_null(cross2['null_frac_mean'].min(), cross2['null_frac_max'].max())}).")
+        tab.note(f"Not evaluated: the {cross2['derivative'].nunique()} cross-element mixed second derivatives (not identified, null share "
+                 f"{_fmt_null(cross2['null_frac_mean'].min(), cross2['null_frac_max'].max())}; the OFAT design gives no FD reference).")
+    _second_order_block(tab)
     tab.note("Held-out = FD points whose centre row is not in that seed's train+val. A random row split keeps fit neighbours in the same (T, c) plane, "
              "so this is an interpolation test, not a held-out-composition test.")
     return tab
@@ -670,38 +755,190 @@ def table_design():
 
 
 # ----------------------------------------------------------------------
-#  Table 5: scaling
+#  Tables 5-6: scaling (scaling_query_timing / _runs / _slopes / _env / _attempts.csv)
 # ----------------------------------------------------------------------
+SCALING_FILES = ["scaling_query_timing.csv", "scaling_runs.csv", "scaling_slopes.csv", "scaling_env.csv"]
+SCALING_N = ["1000", "real", "100000", "1000000"]          # n_label values, in table order
+# (method in scaling_query_timing.csv, column header)
+QUERY_METHODS = [("SymGWR-T", "SymGWR-T"), ("SymGWR-R", "SymGWR-R"), ("Spline_scipy", "Cubic spline (scipy)"),
+                 ("KDTree_NN_only", "NN lookup only")]
+P99_METHODS = ["SymGWR-T", "Spline_scipy"]
+# pycalphad reference timings (results/, one level above IN_DIR): (file, label)
+PYCALPHAD = [("calphad_reference_timing_pycalphad_calculate_precompiled.csv", "calculate, precompiled phase records"),
+             ("calphad_reference_timing_pycalphad_calculate.csv", "calculate (FCC_A1)"),
+             ("calphad_reference_timing_pycalphad.csv", "equilibrium (all phases)")]
+
+
+def sci(x, sig=2):
+    """Plain-text ratio that survives LaTeX escaping: 43, 3,500, 1.3e8."""
+    if x < 1e4:
+        return f"{float(f'{x:.{sig}g}'):,.0f}"
+    e = _exp10(x)
+    return f"{x / 10.0 ** e:.{sig - 1}f}e{e}"
+
+
+def _scaling_row_label(n_label, nreal):
+    return f"{nreal:,} (real)" if n_label == "real" else f"{int(n_label):,}"
+
+
+def _pending_scaling(msg):
+    tab = Table("scaling", "Scaling of query time with the number of reference points",
+                "Per-query latency vs. number of reference points n.", "ll", ["Status", "Detail"], wide=False)
+    tab.row([T("pending"), T(msg)])
+    tab.note(f"Generated automatically once {', '.join(SCALING_FILES)} exist in {IN_DIR}/.")
+    return [tab]
+
+
 def table_scaling():
-    files = sorted(glob.glob(os.path.join(IN_DIR, "scaling*.csv")))
-    tab = Table("scaling", "Scaling", "Scaling of fit/evaluation cost with data size.", "ll", ["Status", "Detail"], wide=False)
-    if not files:
-        tab.row([T("pending"), T(f"no scaling*.csv in {IN_DIR}/ yet")])
-        tab.note("This table is generated automatically once results/camera_ready/scaling*.csv exists "
-                 "(expected columns: n, method, measurement_type, mean, std, n_repeats).")
+    paths = {f: os.path.join(IN_DIR, f) for f in SCALING_FILES}
+    miss = [f for f, p_ in paths.items() if not os.path.exists(p_)]
+    if miss:
+        return _pending_scaling(f"missing in {IN_DIR}/: {', '.join(miss)}")
+    q = pd.read_csv(paths["scaling_query_timing.csv"], dtype={"n_label": str})
+    runs = pd.read_csv(paths["scaling_runs.csv"], dtype={"n_label": str})
+    slopes = pd.read_csv(paths["scaling_slopes.csv"])
+    env = dict(pd.read_csv(paths["scaling_env.csv"], dtype=str).values)
+    need_q = {"n", "n_label", "rep", "method", "mean_us", "p99_us", "n_queries"}
+    need_r = {"n", "n_label", "rep", "ref_kind", "t_grad_precompute_s", "grad_precompute_us_per_ref", "grad_mb", "t_pref_precompute_s",
+              "pref_mb", "symgwr_T_storage_mb", "symgwr_R_storage_mb"}
+    need_s = {"method", "stat", "slope", "ci95_lo", "ci95_hi", "n_points"}
+    for nm, df, nd in (("scaling_query_timing.csv", q, need_q), ("scaling_runs.csv", runs, need_r), ("scaling_slopes.csv", slopes, need_s)):
+        if not nd <= set(df.columns):
+            return _pending_scaling(f"unrecognised schema in {nm}: missing columns {sorted(nd - set(df.columns))}")
+    nreal = int(q.loc[q["n_label"] == "real", "n"].iloc[0])
+    sizes = [n for n in SCALING_N if n in set(q["n_label"])]
+    nrep = q["rep"].nunique()
+    qm = q.groupby(["n_label", "method"])[["mean_us", "p99_us"]].mean()      # mean over repeats
+
+    # ---- Table 5: query time
+    head = ["n"] + [h for _, h in QUERY_METHODS] + [dict(QUERY_METHODS)[m] for m in P99_METHODS]
+    t5 = Table("scaling", "Query time vs. number of reference points",
+               f"Per-query latency of the nearest-reference surrogates: mean (and p99) over {int(q['n_queries'].iloc[0]):,} timed queries, "
+               f"averaged over {nrep} repeats. Last row: log-log slope of query time against n with 95% CI (slope 0 = constant time).",
+               "l" + "r" * (len(head) - 1), head,
+               groups=[("", 1), ("Mean query time (µs)", len(QUERY_METHODS)), ("p99 query time (µs)", len(P99_METHODS))],
+               wide=True, size="scriptsize")
+    for nl in sizes:
+        row = [T(_scaling_row_label(nl, nreal))]
+        row += [num(qm.loc[(nl, m), "mean_us"]) for m, _ in QUERY_METHODS]
+        row += [num(qm.loc[(nl, m), "p99_us"]) for m in P99_METHODS]
+        t5.row(row)
+    t5.rule()
+    sl = lambda m, st: slopes[(slopes["method"] == m) & (slopes["stat"] == st)]
+    srow = [T("Slope [95% CI]")]
+    for m, st in [(m, "mean_us") for m, _ in QUERY_METHODS] + [(m, "p99_us") for m in P99_METHODS]:
+        r = sl(m, st)
+        srow.append(T(f"{r['slope'].iloc[0]:.2f} [{r['ci95_lo'].iloc[0]:.2f}, {r['ci95_hi'].iloc[0]:.2f}]") if len(r) else C(EM))
+    t5.row(srow)
+
+    t5.note(f"Sizes above {nreal:,} are tiled copies of the {nreal:,} real reference points with {100 * float(env['jitter_frac_of_std']):g}% "
+            "jitter (of each feature's std): they test index (KD-tree) behaviour, not accuracy. "
+            f"n = 1,000 is a subset of the real references. n = {nreal:,} is the real fit ({env['split']}).")
+    nsz = q["n"].nunique()
+    allpos = bool((slopes["ci95_lo"] > 0).all())
+    t5.note(f"Slope: least-squares fit of log query time on log n over {int(slopes['n_points'].max())} points = {nsz} distinct sizes × {nrep} repeats, "
+            f"so the CI rests on only {nsz} distinct sizes. "
+            + ("Every CI excludes 0 (time grows with n for every method; slope < 1 is sublinear)." if allpos else "See scaling_slopes.csv for which CIs include 0."))
+    t5.note(f"Timing protocol: process pinned to core {env['pinned_core']}, OMP_NUM_THREADS={env['OMP_NUM_THREADS']}, GC {env['gc_during_timing']} while timing, "
+            f"{int(env['n_warmup_queries']):,} warm-up queries; {env['cpu_model']}; Python {env['python']}, NumPy {env['numpy']}, SciPy {env['scipy']}. "
+            f"Nearest-reference search is a KD-tree over the {len(env['feature_cols'].split('|'))} scaled feature columns ({env['tree_effective_dims']} effective: "
+            "Ni is constant). Cubic spline = scipy implementation (`Spline_scipy`); the lean spline variant in the CSVs is not shown.")
+    try:
+        att = pd.read_csv(os.path.join(IN_DIR, "scaling_attempts.csv"), dtype={"n_label": str})
+        bad = att[att["status"] != "ok"]
+        if len(bad):
+            t5.note("Attempts discarded for external load and re-run (load_discard_rule: " + env["load_discard_rule"] + "): " +
+                    "; ".join(f"n={_scaling_row_label(r.n_label, nreal)} repeat {r.rep} ({r.status})" for r in bad.itertuples()) + ".")
+    except FileNotFoundError:
+        pass
+
+    # latency / speedup vs pycalphad (separate measurement, different database)
+    real_us = {m: qm.loc[("real", m), "mean_us"] for m in ("SymGWR-T", "SymGWR-R")}
+    pyc, parts = [], []
+    for f, lab in PYCALPHAD:
+        pth = os.path.join(IN_DIR, "..", f)
+        if os.path.exists(pth):
+            ms = float(pd.read_csv(pth)["latency_ms"].mean())
+            n_pyc = len(pd.read_csv(pth))
+            pyc.append((lab, ms))
+            parts.append(f"{lab}: {ms:.4g} ms → {sci(ms * 1e3 / real_us['SymGWR-T'])}× vs SymGWR-T, {sci(ms * 1e3 / real_us['SymGWR-R'])}× vs SymGWR-R")
+    if pyc:
+        tdb = next((re.search(r"(mc_fe_[\w.]+?\.tdb)", g).group(1) for g in glob.glob(os.path.join(IN_DIR, "..", "calphad_reference_timing_pycalphad__*.csv"))
+                    if re.search(r"(mc_fe_[\w.]+?\.tdb)", g)), "steel TDB")
+        t5.note(f"Speedup vs pycalphad (mean latency over {n_pyc} queries / mean SymGWR query time at n = {nreal:,}, "
+                f"SymGWR-T {real_us['SymGWR-T']:.3g} µs, SymGWR-R {real_us['SymGWR-R']:.3g} µs): " + "; ".join(parts) + ". "
+                f"Caveat: the pycalphad database is a steel database ({tdb}, Fe–Cr–Ni–C–Mn–Mo–Si), not the Nb–Al–Ti–Mo–Fe–Ni–Cr system SymGWR is fitted to, "
+                "and pycalphad was timed in a separate run (calphad_reference_timing_pycalphad*.csv), not under the pinned-core protocol above; "
+                "the ratios indicate orders of magnitude only.")
+
+    # ---- Table 6: precompute time and storage
+    rm = runs.groupby("n_label")[["t_grad_precompute_s", "grad_precompute_us_per_ref", "grad_mb", "t_pref_precompute_s", "pref_mb",
+                                  "symgwr_T_storage_mb", "symgwr_R_storage_mb"]].mean()
+    t6 = Table("scalingstore", "Precompute time and storage vs. number of reference points",
+               f"One-time cost of the reference gradients (SymGWR-T) and of P at the references (SymGWR-R), and resident storage; mean over {runs['rep'].nunique()} repeats.",
+               "lrrrrrrr", ["n", "Time (s)", "µs/ref", "MB", "Time (s)", "MB", "SymGWR-T", "SymGWR-R"],
+               groups=[("", 1), ("Gradient at refs (T)", 3), ("P at refs (R)", 2), ("Total storage (MB)", 2)], wide=True, size="scriptsize")
+    for nl in [n for n in SCALING_N if n in rm.index]:
+        r = rm.loc[nl]
+        t6.row([T(_scaling_row_label(nl, nreal)), num(r["t_grad_precompute_s"]), num(r["grad_precompute_us_per_ref"]), num(r["grad_mb"]),
+                num(r["t_pref_precompute_s"]), num(r["pref_mb"]), num(r["symgwr_T_storage_mb"]), num(r["symgwr_R_storage_mb"])])
+    t6.note(f"Gradients: {env['gradient_path']}. SymGWR-T stores the gradient at every reference, SymGWR-R stores P at every reference. "
+            "Storage in MB (1 MB = 2^20 B; gradient storage = n × 8 float64 values). Total = reference rows + gradient (T) or P(ref) (R) + "
+            "measured KD-tree memory (RSS delta; noisy at small n).")
+    t6.note(f"Sizes above {nreal:,} are tiled with {100 * float(env['jitter_frac_of_std']):g}% jitter, as in Table 5.")
+    return [t5, t6]
+
+
+# ----------------------------------------------------------------------
+#  Table 7: Newton test (newton_summary.csv, newton_runs.csv)
+# ----------------------------------------------------------------------
+# (surrogate in newton_summary.csv, label, note key); protocol-free rows (protocol "n/a") are run once per composition
+NEWTON_ROWS = [("reference", "Reference (truth)", None), ("Polynomial", "Polynomial", None), ("SymGWR-R", "SymGWR-R", None),
+               ("SymGWR-T", "SymGWR-T, Newton", None), ("SymGWR-T_secant", "SymGWR-T, secant", None), ("SymGWR-T_brent", "SymGWR-T, Brent", "found a sign change (not |R|<tol)"),
+               ("Spline_train", "Spline (train rows)", None), ("Spline_full_raw", "Spline (full raw table)", None),
+               ("SymGWR-R-IDW", f"SymGWR-R-IDW (k={K_SHOW})", None), ("SymGWR-R-CS", f"SymGWR-R-CS (k={K_SHOW})", None)]
+NEWTON_PROTO = {"random": "Random", "temp_band": "Temp.-band", "n/a": EM}
+
+
+def table_newton():
+    path_s, path_r = os.path.join(IN_DIR, "newton_summary.csv"), os.path.join(IN_DIR, "newton_runs.csv")
+    tab = Table("newton", "Newton–Raphson test of the surrogates' analytic Jacobians (0-D implicit cooling)",
+                "", "llrrrrp{3.4cm}", ["Surrogate", "Protocol", "Converged (%)", "Mean iters", "Escaped (%)", "Max ΔT (K): median (max)", "Note"],
+                wide=True, size="scriptsize")
+    if not (os.path.exists(path_s) and os.path.exists(path_r)):
+        tab.caption = "Newton test of the surrogates' analytic Jacobians."
+        tab.row([T("pending")] + [C("")] * 6)
+        tab.note("Generated automatically once newton_summary.csv and newton_runs.csv exist.")
         return tab
-    df = pd.concat([pd.read_csv(f).assign(_src=os.path.basename(f)) for f in files], ignore_index=True)
-    need = {"n", "method", "measurement_type", "mean", "std"}
-    if not need <= set(df.columns):
-        tab.row([T("unrecognised schema"), T(f"{[os.path.basename(f) for f in files]}: columns {list(df.columns)}")])
-        tab.note(f"Expected columns {sorted(need)}.")
-        return tab
-    mt = list(dict.fromkeys(df["measurement_type"]))
-    methods = list(dict.fromkeys(df["method"]))
-    ns = sorted(df["n"].unique())
-    groups = [("", 1)] + [(m, len(methods)) for m in mt]
-    t2 = Table("scaling", "Scaling", "Cost vs. data size n: mean ± std over repeats"
-               + (f" ({int(df['n_repeats'].iloc[0])} repeats)" if "n_repeats" in df and df["n_repeats"].nunique() == 1 else "") + ".",
-               "l" + "r" * (len(methods) * len(mt)), ["n"] + methods * len(mt), groups=groups, wide=len(methods) * len(mt) > 3)
-    for n in ns:
-        row = [intc(n)]
-        for m_ in mt:
-            for me in methods:
-                r = df[(df["n"] == n) & (df["method"] == me) & (df["measurement_type"] == m_)]
-                row.append(mean_std(r["mean"].iloc[0], r["std"].iloc[0]) if len(r) else C(EM))
-        t2.row(row)
-    t2.note("Source: " + ", ".join(os.path.basename(f) for f in files) + ".")
-    return t2
+    sm = pd.read_csv(path_s, keep_default_na=False, na_values=[""])
+    sm["protocol"] = sm["protocol"].astype(str)
+    runs = pd.read_csv(path_r, keep_default_na=False, na_values=[""], usecols=["surrogate", "n_steps"])
+    nsteps = int(runs["n_steps"].max())
+    nref = int(sm.loc[sm["surrogate"] == "reference", "n_runs"].iloc[0])           # compositions
+    nrun = int(sm.loc[sm["surrogate"] == "Polynomial", "n_runs"].max())
+    nseed = nrun // nref
+    cap = int(sm.loc[sm["surrogate"] == "SymGWR-T", "iters_max"].max())   # Newton iteration cap
+    tab.caption = (f"Implicit cooling of one lumped body per composition ({nref} compositions, {nsteps} steps) solved with each surrogate's enthalpy "
+                   f"H = G − T dG/dT and its Jacobian dH/dT = −T d²G/dT². Mean over {nseed} seeds × {nref} compositions ({nrun} runs) per surrogate and protocol. "
+                   "Converged = every step reaches |R| < tol within the iteration cap; escaped = the accepted temperature left the data window; "
+                   "Max ΔT = largest temperature error against the truth along a run.")
+    for sur, lab, note in NEWTON_ROWS:
+        for _, r in sm[sm["surrogate"] == sur].iterrows():
+            if r["protocol"] not in NEWTON_PROTO:
+                continue
+            ref_row = sur == "reference"
+            maxdt = C(EM) if ref_row else C(f"{num(r['max_dT_K_median']).md} ({num(r['max_dT_K_max']).md})",
+                                             f"{num(r['max_dT_K_median']).tex} ({num(r['max_dT_K_max']).tex})")
+            tab.row([T(lab), T(NEWTON_PROTO[r["protocol"]]), num(r["converged_pct"]), num(r["iters_mean"]), num(r["escaped_pct"]), maxdt,
+                     T(note) if note else C("")])
+    tab.note("0-D implicit cooling with a lumped body, not a phase-field simulation. The truth is a degree-4 smoothing spline of G, because the raw table is rounded "
+             "(1 J/mol for |G| ≥ 1e5), so the second derivative of a spline interpolating it is quantisation noise. Reference and full-raw-spline rows run once per composition "
+             f"({nref} runs, no protocol); the other rows are run per seed and protocol.")
+    tab.note(f"Brent: converged = found a sign change (not |R|<tol), so it says nothing about the residual; its iterations are bracketing iterations, not Newton iterations. "
+             f"Newton and secant: at most {cap} iterations per step.")
+    tab.note(f"Spline (train rows) = cubic spline along T through the fit rows of the composition; Spline (full raw table) = cubic spline of the full raw table, "
+             f"run against the smooth truth. {EM} = not defined (no protocol; the reference has zero error by construction).")
+    return tab
 
 
 # ----------------------------------------------------------------------
@@ -715,8 +952,11 @@ def main():
     out_dir = args.out_dir or IN_DIR
     os.makedirs(out_dir, exist_ok=True)
 
-    builders = [table_accuracy, table_derivative, table_continuity, table_design, table_scaling]
-    tables = [b() for b in builders]
+    builders = [table_accuracy, table_derivative, table_continuity, table_design, table_scaling, table_newton]
+    tables = []
+    for b in builders:
+        r_ = b()
+        tables += r_ if isinstance(r_, list) else [r_]
     md = ["# Camera-ready paper tables", "",
           f"Generated by `experiments/export_paper_tables.py` from `{IN_DIR}/*.csv` (+ `design_audit.json`). Do not edit by hand.", ""]
     tex = ["% Generated by experiments/export_paper_tables.py -- do not edit by hand.",
