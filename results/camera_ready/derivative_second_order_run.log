@@ -1,0 +1,28 @@
+rows=7938 compositions=98 temperatures=81; 37.9% of G on the 1 J/mol quantum
+d2G/dT2 expected n = 98 x 79 = 7742; got 7742
+FD-eligible points per term: {'d2/dT2': 7742, 'd2/dNb2': 1944, 'd2/dAl2': 648, 'd2/dTi2': 1539, 'd2/dMo2': 1539, 'd2/dFe2': 648, 'd2/dCr2': 729, 'd2/dTdNb': 1896, 'd2/dTdAl': 632, 'd2/dTdTi': 1501, 'd2/dTdMo': 1501, 'd2/dTdFe': 632, 'd2/dTdCr': 711}
+ladder (cap, |common set|): {'d2/dT2': (5, 6958), 'd2/dNb2': (3, 1620), 'd2/dAl2': (3, 324), 'd2/dTi2': (3, 1215), 'd2/dMo2': (3, 1215), 'd2/dFe2': (2, 324), 'd2/dCr2': (3, 405), 'd2/dTdNb': (3, 1420), 'd2/dTdAl': (3, 284), 'd2/dTdTi': (3, 1065), 'd2/dTdMo': (3, 1065), 'd2/dTdFe': (2, 284), 'd2/dTdCr': (3, 355)}
+seed 42: rank=95/1286 (47.4s)
+seed 43: rank=95/1286 (51.2s)
+seed 44: rank=95/1286 (47.5s)
+seed 45: rank=95/1286 (53.3s)
+seed 46: rank=95/1286 (56.2s)
+seed 47: rank=95/1286 (65.7s)
+seed 48: rank=95/1286 (55.6s)
+seed 49: rank=95/1286 (50.6s)
+seed 50: rank=95/1286 (43.7s)
+seed 51: rank=95/1286 (50.7s)
+        term  n_mean  mae_mean  typical_abs_mean  normalized_error_mean  noise_rms_mean  noise_over_mae_mean  noise_over_typical_mean  noise_sq_share_mean  trunc_over_mae  flag_fd_limited
+0     d2/dT2    7742  0.003004           0.02743                 0.1095        0.004335                1.443                    0.158               0.8307       0.0002629             True
+3    d2/dNb2    1944 4.174e+04         2.312e+05                 0.1805            4256                0.102                  0.01841             0.001074        0.009828            False
+6    d2/dAl2     648 8.063e+04          1.11e+06                0.07264            1292              0.01604                 0.001164            0.0002004          0.1645            False
+9    d2/dTi2    1539 9.971e+04         7.148e+05                 0.1395            4602              0.04616                 0.006439            0.0004698         0.02401            False
+12   d2/dMo2    1539 4.171e+04          1.94e+05                  0.215            4082              0.09788                  0.02104             0.001024          0.0144            False
+15   d2/dFe2     648 4.293e+04         1.028e+05                 0.4177            6923               0.1616                  0.06736              0.01408         0.07489            False
+18   d2/dCr2     729  4.93e+04         1.164e+05                 0.4234            4067              0.08261                  0.03493             0.005307         0.09745            False
+21  d2/dTdNb    1896    0.6938             5.165                 0.1343          0.8645                1.247                   0.1674               0.5524         0.01804             True
+24  d2/dTdAl     632     2.552             20.12                 0.1268           0.527               0.2066                  0.02619              0.01461          0.1632            False
+27  d2/dTdTi    1501     3.968             7.301                 0.5435           0.937               0.2361                   0.1283              0.02104         0.01421            False
+30  d2/dTdMo    1501    0.6263             10.25                 0.0611          0.8277                1.322                  0.08075               0.7114         0.03497             True
+33  d2/dTdFe     632    0.7387             9.011                0.08197          0.9711                1.322                   0.1078               0.8799         0.09376             True
+36  d2/dTdCr     711    0.6868             5.096                 0.1348          0.8255                1.209                    0.162               0.7053         0.02977             True

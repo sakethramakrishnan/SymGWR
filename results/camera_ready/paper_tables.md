@@ -147,12 +147,36 @@ Dataset: 8,181 raw rows, 7,938 after exact-duplicate removal on the 8 features (
 - Constant feature column(s): Mass_fraction_Ni.
 - Design statistics are over the seeds stored in design_audit.json (seeds listed per design: random_dedupe=10, temp_band_dedupe=10, composition_group_dedupe=10, random_no_dedupe=1).
 
-### Table 5. Scaling
+### Table 5. Query time vs. number of reference points
 
-Scaling of fit/evaluation cost with data size.
+Per-query latency of the nearest-reference surrogates: mean (and p99) over 10,000 timed queries, averaged over 3 repeats. Last row: log-log slope of query time against n with 95% CI (slope 0 = constant time).
 
-| Status | Detail |
-|:--|:--|
-| pending | no scaling*.csv in results/camera_ready/ yet |
+|  | Mean query time (µs) |  |  |  | p99 query time (µs) |  |
+|:--|--:|--:|--:|--:|--:|--:|
+| **n** | **SymGWR-T** | **SymGWR-R** | **Cubic spline (scipy)** | **NN lookup only** | **SymGWR-T** | **Cubic spline (scipy)** |
+| 1,000 | 19.3 | 55.3 | 23.0 | 15.5 | 28.7 | 31.4 |
+| 6,350 (real) | 20.3 | 56.5 | 23.5 | 16.7 | 28.6 | 33.2 |
+| 100,000 | 93.2 | 135 | 28.6 | 89.3 | 198 | 41.1 |
+| 1,000,000 | 268 | 312 | 33.6 | 263 | 800 | 59.0 |
+| Slope [95% CI] | 0.41 [0.34, 0.48] | 0.26 [0.21, 0.31] | 0.06 [0.05, 0.07] | 0.44 [0.37, 0.51] | 0.52 [0.42, 0.61] | 0.09 [0.07, 0.11] |
 
-- This table is generated automatically once results/camera_ready/scaling*.csv exists (expected columns: n, method, measurement_type, mean, std, n_repeats).
+- Sizes above 6,350 are tiled copies of the 6,350 real reference points with 1% jitter (of each feature's std): they test index (KD-tree) behaviour, not accuracy. n = 1,000 is a subset of the real references. n = 6,350 is the real fit (random seed 42).
+- Slope: least-squares fit of log query time on log n over 12 points = 4 distinct sizes × 3 repeats, so the CI rests on only 4 distinct sizes. Every CI excludes 0 (time grows with n for every method; slope < 1 is sublinear).
+- Timing protocol: process pinned to core 10, OMP_NUM_THREADS=1, GC disabled while timing, 2,000 warm-up queries; AMD Ryzen 7 5700U with Radeon Graphics; Python 3.14.4, NumPy 2.5.1, SciPy 1.18.0. Nearest-reference search is a KD-tree over the 8 scaled feature columns (7 effective: Ni is constant). Cubic spline = scipy implementation (`Spline_scipy`); the lean spline variant in the CSVs is not shown.
+- Attempts discarded for external load and re-run (load_discard_rule: discard attempt if 10s-rolling external busy cores + 1 > 2.0): n=1,000,000 repeat 1 (discarded_load).
+- Speedup vs pycalphad (mean latency over 100 queries / mean SymGWR query time at n = 6,350, SymGWR-T 20.3 µs, SymGWR-R 56.5 µs): calculate, precompiled phase records: 0.8735 ms → 43× vs SymGWR-T, 15× vs SymGWR-R; calculate (FCC_A1): 70.48 ms → 3,500× vs SymGWR-T, 1,200× vs SymGWR-R; equilibrium (all phases): 5309 ms → 2.6e5× vs SymGWR-T, 9.4e4× vs SymGWR-R. Caveat: the pycalphad database is a steel database (mc_fe_v2.059.pycalphad.tdb, Fe–Cr–Ni–C–Mn–Mo–Si), not the Nb–Al–Ti–Mo–Fe–Ni–Cr system SymGWR is fitted to, and pycalphad was timed in a separate run (calphad_reference_timing_pycalphad*.csv), not under the pinned-core protocol above; the ratios indicate orders of magnitude only.
+
+### Table 6. Precompute time and storage vs. number of reference points
+
+One-time cost of the reference gradients (SymGWR-T) and of P at the references (SymGWR-R), and resident storage; mean over 3 repeats.
+
+|  | Gradient at refs (T) |  |  | P at refs (R) |  | Total storage (MB) |  |
+|:--|--:|--:|--:|--:|--:|--:|--:|
+| **n** | **Time (s)** | **µs/ref** | **MB** | **Time (s)** | **MB** | **SymGWR-T** | **SymGWR-R** |
+| 1,000 | 0.0607 | 60.7 | 0.0610 | 0.0116 | 7.63×10⁻³ | 0.382 | 0.329 |
+| 6,350 (real) | 0.179 | 28.2 | 0.388 | 0.0649 | 0.0484 | 1.09 | 0.749 |
+| 100,000 | 9.01 | 90.1 | 6.10 | 0.809 | 0.763 | 16.1 | 10.8 |
+| 1,000,000 | 84.9 | 84.9 | 61.0 | 6.47 | 7.63 | 158 | 104 |
+
+- Gradients: gwr.gradients.evaluate_polynomial_pipeline_gradients (explicit, no SymPy). SymGWR-T stores the gradient at every reference, SymGWR-R stores P at every reference. Storage in MB (1 MB = 2^20 B; gradient storage = n × 8 float64 values). Total = reference rows + gradient (T) or P(ref) (R) + measured KD-tree memory (RSS delta; noisy at small n).
+- Sizes above 6,350 are tiled with 1% jitter, as in Table 5.
