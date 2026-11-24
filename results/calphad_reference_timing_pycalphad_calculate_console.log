@@ -24,7 +24,7 @@ pickle_path:     /home/saketh/Documents/saketh/gwr/experiments/calphad_ref_data/
 
 equilibrium_phases: ['LIQUID', 'FCC_A1', 'BCC_A2', 'HCP_A3', 'CEMENTITE', 'SIGMA', 'M23C6', 'M7C3']
 calculate_phase:    FCC_A1
-calculate_reason:   FCC_A1 (austenite) is the substitutional matrix / majority phase for the Fe-Cr-Ni-rich compositions in this query set; single-phase G(X,T) on FCC_A1 is the operation GWR approximates, not multi-phase equilibrium.
+calculate_reason:   FCC_A1 (austenite) is the substitutional matrix / majority phase for the Fe-Cr-Ni-rich compositions in this query set; single-phase G(X,T) on FCC_A1 is the operation SymGWR approximates, not multi-phase equilibrium.
 
 ========================================================================
 pycalphad CALPHAD equilibrium() reference timing
@@ -63,7 +63,7 @@ function:        calculate()  [single-phase G; NO equilibrium]
 config_id:       calculate__mc_fe_v2.059.pycalphad.tdb__8comp__FCC_A1__nq100__4e46b30b6048
 Components:      ['FE', 'CR', 'NI', 'C', 'MN', 'MO', 'SI', 'VA']
 phase:           FCC_A1
-phase_reason:    FCC_A1 (austenite) is the substitutional matrix / majority phase for the Fe-Cr-Ni-rich compositions in this query set; single-phase G(X,T) on FCC_A1 is the operation GWR approximates, not multi-phase equilibrium.
+phase_reason:    FCC_A1 (austenite) is the substitutional matrix / majority phase for the Fe-Cr-Ni-rich compositions in this query set; single-phase G(X,T) on FCC_A1 is the operation SymGWR approximates, not multi-phase equilibrium.
 n_query_points:  8
 n_timed_queries: 100
 timing_csv:      /home/saketh/Documents/saketh/gwr/results/calphad_reference_timing_pycalphad__calculate__mc_fe_v2.059.pycalphad.tdb__8comp__FCC_A1__nq100__4e46b30b6048.csv
@@ -121,7 +121,7 @@ min_ms                    66.615565        3969.733796        59.59x
 max_ms                    82.532737        6660.495725        80.70x
 
 NOTE: calculate() = single-phase G(X,T); equilibrium() = multiphase solve.
-GWR surrogate compares to calculate(), not equilibrium().
+SymGWR surrogate compares to calculate(), not equilibrium().
 
 --- cache inventory ---
 Database pickle: /home/saketh/Documents/saketh/gwr/experiments/calphad_ref_data/model_cache/database__mc_fe_v2.059.pycalphad.tdb__467211ab854400ac.pkl [MISS]

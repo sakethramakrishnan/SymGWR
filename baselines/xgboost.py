@@ -2,7 +2,7 @@
 baselines.xgboost
 =================
 
-XGBoost regressor baseline for comparison against GWR.
+XGBoost regressor baseline for comparison against SymGWR.
 """
 
 from __future__ import annotations

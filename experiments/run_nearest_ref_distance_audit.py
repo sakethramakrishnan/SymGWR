@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-"""Audit nearest-reference distances for locked GWR (degree=5, k=1).
+"""Audit nearest-reference distances for locked SymGWR (degree=5, k=1).
 
 Loads cached fitted models when present; fits/caches on miss. Computes
-test→reference 1-NN distances in the same scaled feature space used by GWR
+test→reference 1-NN distances in the same scaled feature space used by SymGWR
 neighbor lookup, plus one spatially-blocked Temperature-band split.
 """
 
@@ -19,12 +19,12 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from scipy.spatial import cKDTree
-from sklearn.model_selection import train_test_split
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from gwr.core import GradientWeightedRegressor
 from gwr.models import fit_polynomial_regression, model_to_sympy_equation
+from gwr.splits import make_spatial_split as _make_spatial_split
 from gwr.utils import compute_all_metrics, load_dataset, train_val_test_split_df
 
 
@@ -216,70 +216,16 @@ def _nn_distances(
 
 
 def _gwr_1nn_distances(gwr: GradientWeightedRegressor, X_query: np.ndarray) -> np.ndarray:
-    """Distances from GWR inference path (_query_absolute_neighbors / cKDTree)."""
+    """Distances from SymGWR inference path (_query_absolute_neighbors / cKDTree)."""
     distances, _, _, _ = gwr._query_absolute_neighbors(
         np.asarray(X_query, dtype=np.float64)
     )
     return distances[:, 0]
 
 
-def _make_spatial_split(
-    df_scaled: pd.DataFrame,
-    df_raw: pd.DataFrame,
-    target: str,
-    t_min: int,
-    t_max: int,
-    remain_seed: int,
-    remain_train_frac: float,
-) -> dict[str, Any]:
-    """Hold out contiguous raw Temperature band; split remainder into train/val."""
-    raw_temp = df_raw["Temperature_[K]"].to_numpy()
-    test_mask = (raw_temp >= t_min) & (raw_temp <= t_max)
-    remain_idx = np.where(~test_mask)[0]
-    test_idx = np.where(test_mask)[0]
-
-    X_all = (
-        df_scaled.drop(columns=[target]).select_dtypes(include=[np.number]).values
-    )
-    y_all = df_scaled[target].values
-
-    X_remain, y_remain = X_all[remain_idx], y_all[remain_idx]
-    X_test, y_test = X_all[test_idx], y_all[test_idx]
-
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_remain,
-        y_remain,
-        train_size=remain_train_frac,
-        random_state=remain_seed,
-    )
-    # recover index arrays aligned to original rows for caching
-    # re-split remain_idx the same way via indices
-    rem_train_i, rem_val_i = train_test_split(
-        remain_idx,
-        train_size=remain_train_frac,
-        random_state=remain_seed,
-    )
-    return {
-        "X_train": X_train,
-        "X_val": X_val,
-        "X_test": X_test,
-        "y_train": y_train,
-        "y_val": y_val,
-        "y_test": y_test,
-        "train_idx": np.asarray(rem_train_i, dtype=np.int64),
-        "val_idx": np.asarray(rem_val_i, dtype=np.int64),
-        "test_idx": np.asarray(test_idx, dtype=np.int64),
-        "t_min": t_min,
-        "t_max": t_max,
-        "n_test": int(len(test_idx)),
-        "n_total": int(len(df_scaled)),
-        "test_frac": float(len(test_idx) / len(df_scaled)),
-    }
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Nearest-reference distance audit for locked GWR"
+        description="Nearest-reference distance audit for locked SymGWR"
     )
     parser.add_argument("--data", type=str, default="data/raw/718_all.csv")
     parser.add_argument("--target", type=str, default="Gibbs_energy")
@@ -302,7 +248,7 @@ def main() -> None:
 
     feature_space_note = (
         "STANDARD-SCALED features via gwr.utils.CustomStandardScaler "
-        "(load_dataset scale=True default). GWR neighbor KD-tree is built on "
+        "(load_dataset scale=True default). SymGWR neighbor KD-tree is built on "
         "these scaled features (NOT raw composition O(1) / Temperature O(1000)). "
         "temp_class is excluded from the numeric feature matrix."
     )
@@ -406,10 +352,10 @@ def main() -> None:
         else:
             dists = _nn_distances(X_test, gwr._ref_points)
             dists["d_full_via_gwr_query"] = _gwr_1nn_distances(gwr, X_test)
-            # confirm GWR path == manual cKDTree on same ref set
+            # confirm SymGWR path == manual cKDTree on same ref set
             if not np.allclose(dists["d_full"], dists["d_full_via_gwr_query"]):
                 raise RuntimeError(
-                    f"seed={seed}: manual 1-NN distances != GWR _query_absolute_neighbors"
+                    f"seed={seed}: manual 1-NN distances != SymGWR _query_absolute_neighbors"
                 )
             np.savez_compressed(dist_path, **dists)
             report["cache_files_written"].append(os.path.abspath(dist_path))
@@ -472,7 +418,7 @@ def main() -> None:
             ],
             "mechanism": "scipy.spatial.cKDTree built on self._ref_points; "
             "query(query_points, k=n_neighbors); Euclidean (default p=2)",
-            "feature_scaling": "same scaled X passed to fit(); no extra scaling inside GWR",
+            "feature_scaling": "same scaled X passed to fit(); no extra scaling inside SymGWR",
             "snippet_query_absolute_neighbors": (
                 "distances, indices = self._kdtree.query(query_points, k=k)\n"
                 "closest_pts = self._ref_points[indices]"
@@ -483,7 +429,7 @@ def main() -> None:
             "function": "_predict_nn_only",
             "mechanism": "calls gwr._predict_components(X) then returns "
             "sum(targets * weights) / mean(targets) with ZERO Taylor correction; "
-            "neighbor lookup is identical to full GWR predict path",
+            "neighbor lookup is identical to full SymGWR predict path",
             "snippet_predict_nn_only": (
                 "_, _, _, targets, weights = gwr._predict_components(X)\n"
                 "if gwr.weighted:\n"
@@ -614,7 +560,7 @@ def main() -> None:
         sdists = _nn_distances(X_test, gwr_s._ref_points)
         sdists["d_full_via_gwr_query"] = _gwr_1nn_distances(gwr_s, X_test)
         if not np.allclose(sdists["d_full"], sdists["d_full_via_gwr_query"]):
-            raise RuntimeError("spatial: manual 1-NN != GWR query distances")
+            raise RuntimeError("spatial: manual 1-NN != SymGWR query distances")
         np.savez_compressed(spatial_dist_path, **sdists)
         report["cache_files_written"].append(os.path.abspath(spatial_dist_path))
 

@@ -2,7 +2,7 @@
 baselines.pinn
 ==============
 
-Physics-Informed Neural Network (PINN) baseline for comparison against GWR.
+Physics-Informed Neural Network (PINN) baseline for comparison against SymGWR.
 
 This module provides a PyTorch-based feed-forward neural network that can
 optionally enforce physics constraints such as monotonicity of the target

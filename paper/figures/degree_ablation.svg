@@ -34,5 +34,5 @@
 <text x="922.86" y="614" text-anchor="middle" font-size="12" font-family="Arial">7</text>
 <text x="1060.00" y="614" text-anchor="middle" font-size="12" font-family="Arial">8</text>
 <text x="580.0" y="678" text-anchor="middle" font-size="14" font-family="Arial">degree</text>
-<text x="36" y="335.0" text-anchor="middle" font-size="14" font-family="Arial" transform="rotate(-90 36,335.0)">GWR MAPE mean</text>
+<text x="36" y="335.0" text-anchor="middle" font-size="14" font-family="Arial" transform="rotate(-90 36,335.0)">SymGWR MAPE mean</text>
 </svg>

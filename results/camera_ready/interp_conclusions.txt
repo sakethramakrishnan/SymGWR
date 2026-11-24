@@ -1,0 +1,43 @@
+Interpolation baselines vs SymGWR (raw MAPE, mean over seeds 42-51, SymGWR on the SAME rows).
+Lower is better. 'beats' = baseline mean MAPE < SymGWR mean MAPE.
+
+== random ==
+  a_linear_T: does NOT beat SymGWR | baseline 2.741e-05 vs SymGWR 2.062e-05 | baseline/SymGWR = 1.33x | better in 0/10 seeds | t-test p=2.81e-07, Wilcoxon p=0.00195
+  b_cubic_T: BEATS SymGWR | baseline 1.737e-06 vs SymGWR 2.062e-05 | baseline/SymGWR = 0.0842x | better in 10/10 seeds | t-test p=5.7e-14, Wilcoxon p=0.00195
+  c_fd_taylor: does NOT beat SymGWR | baseline 3.744e-05 vs SymGWR 2.062e-05 | baseline/SymGWR = 1.82x | better in 6/10 seeds | t-test p=0.143, Wilcoxon p=0.557
+  d_idw_k8: does NOT beat SymGWR | baseline 3.529e-03 vs SymGWR 2.062e-05 | baseline/SymGWR = 171x | better in 0/10 seeds | t-test p=7.97e-13, Wilcoxon p=0.00195
+  e_linear_arm: n/a
+  e_cubic_arm: n/a
+  -> any interpolation baseline beats SymGWR on random: YES
+
+== temp_band ==
+  a_linear_T: does NOT beat SymGWR | baseline 7.468e-04 vs SymGWR 3.686e-04 | baseline/SymGWR = 2.03x | better in 0/10 seeds | t-test p=1.77e-103, Wilcoxon p=0.00195
+  b_cubic_T: BEATS SymGWR | baseline 2.651e-06 vs SymGWR 3.686e-04 | baseline/SymGWR = 0.00719x | better in 10/10 seeds | t-test p=2.38e-103, Wilcoxon p=0.00195
+  c_fd_taylor: does NOT beat SymGWR | baseline 4.397e-04 vs SymGWR 3.686e-04 | baseline/SymGWR = 1.19x | better in 0/10 seeds | t-test p=6.08e-97, Wilcoxon p=0.00195
+  d_idw_k8: does NOT beat SymGWR | baseline 4.677e-02 vs SymGWR 3.686e-04 | baseline/SymGWR = 127x | better in 0/10 seeds | t-test p=2.95e-17, Wilcoxon p=0.00195
+  e_linear_arm: n/a
+  e_cubic_arm: n/a
+  -> any interpolation baseline beats SymGWR on temp_band: YES
+
+== composition_group ==
+  a_linear_T: n/a
+  b_cubic_T: n/a
+  c_fd_taylor: n/a
+  d_idw_k8: does NOT beat SymGWR | baseline 5.152e-03 vs SymGWR 6.301e-04 | baseline/SymGWR = 8.18x | better in 0/10 seeds | t-test p=1.22e-06, Wilcoxon p=0.00195
+  e_linear_arm: does NOT beat SymGWR | baseline 5.756e-04 vs SymGWR 4.345e-04 | baseline/SymGWR = 1.32x | better in 0/10 seeds | t-test p=0.0045, Wilcoxon p=0.00195
+  e_cubic_arm: BEATS SymGWR | baseline 1.466e-05 vs SymGWR 4.345e-04 | baseline/SymGWR = 0.0337x | better in 10/10 seeds | t-test p=1.04e-05, Wilcoxon p=0.00195
+  -> any interpolation baseline beats SymGWR on composition_group: YES
+
+== composition_group sensitivity: folds where the star-center (base) composition is in TEST ==
+  flagged seeds (star center in test): [48, 49, 50]; remaining 7 seeds below
+  SymGWR: MAPE 5.005e-04 (n_seeds=7)
+  residual_anchored: MAPE 2.478e-04 (n_seeds=7)
+  second_order: MAPE 2.482e-04 (n_seeds=7)
+  d_idw_k8: MAPE 4.825e-03 (n_seeds=7)
+  e_linear_arm: MAPE 5.435e-04 vs SymGWR same rows 4.157e-04 (ratio 1.31x, n_seeds=7)
+  e_cubic_arm: MAPE 1.133e-05 vs SymGWR same rows 4.157e-04 (ratio 0.0273x, n_seeds=7)
+
+NOTES
+  * temp_band: the reference set (all non-band rows) and the test set are identical for every seed, so every T-line baseline is deterministic across seeds; only SymGWR/IDW vary (via the train-only scaler). The across-seed std and the paired p-values for temp_band are therefore NOT independent evidence (effectively n=1).
+  * composition_group: seeds 42/47, 43/48, 44/49, 45/50, 46/51 share a test fold index but use different shuffles; the 10 seeds are 5 folds x 2 shuffles, not 10 independent splits.
+  * e_*: evaluated only on test rows whose composition is bracketed by reference compositions on its arm (no extrapolation; star-center rows n/a); SymGWR is compared on the SAME rows.

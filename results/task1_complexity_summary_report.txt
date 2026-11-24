@@ -4,8 +4,8 @@ Method reconciliation:
 - Locked v2 file uses a single canonical warmed 10,000-query distribution for quantiles/center.
 - Independent multi-process runs are retained as noise characterization, not quantile source.
 Measured quantities:
-- GWR fit time: results/complexity_scaling.csv, columns [n, mean, std], filter method=GWR, measurement_type=fit_time_s
-- GWR query time: results/complexity_scaling.csv, columns [n, mean, std], filter method=GWR, measurement_type=query_time_s
+- SymGWR fit time: results/complexity_scaling.csv, columns [n, mean, std], filter method=GWR, measurement_type=fit_time_s
+- SymGWR query time: results/complexity_scaling.csv, columns [n, mean, std], filter method=GWR, measurement_type=query_time_s
 - GP fit time (GEK stand-in): results/complexity_scaling.csv, columns [n, mean, std], filter method=GaussianProcess, measurement_type=fit_time_s
 - Locked timing cross-check source: results/gwr_timing_detail_v2_locked.csv, mode=single_query
 Notes:

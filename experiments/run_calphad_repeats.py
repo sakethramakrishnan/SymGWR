@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Run CALPHAD headline GWR config across 10 split seeds.
+"""Run CALPHAD headline SymGWR config across 10 split seeds.
 
 NOTE: This script is the authoritative source for headline CALPHAD results and
 replaces `results/gwr_results_raw.csv` for manuscript reporting. The old file
@@ -27,7 +27,7 @@ RANDOM_STATES = list(range(10))
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="CALPHAD repeats for fixed GWR config")
+    parser = argparse.ArgumentParser(description="CALPHAD repeats for fixed SymGWR config")
     parser.add_argument("--data", type=str, default="data/raw/718_all.csv")
     parser.add_argument("--target", type=str, default="Gibbs_energy")
     parser.add_argument("--degree", type=int, default=4)

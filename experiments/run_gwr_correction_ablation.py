@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Ablation: full GWR vs correction-zeroed (1-NN) at locked config (degree=5, k=1).
+"""Ablation: full SymGWR vs correction-zeroed (1-NN) at locked config (degree=5, k=1).
 
 Compares Taylor gradient correction against returning the nearest reference
 target only, using the same fitted model, reference set, and test split as
@@ -125,7 +125,7 @@ def _population_summary(values: np.ndarray) -> tuple[float, float]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="GWR correction-term ablation at locked degree=5, k=1"
+        description="SymGWR correction-term ablation at locked degree=5, k=1"
     )
     parser.add_argument("--data", type=str, default="data/raw/718_all.csv")
     parser.add_argument("--target", type=str, default="Gibbs_energy")

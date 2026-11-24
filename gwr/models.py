@@ -5,7 +5,7 @@ gwr.models
 Wrappers around scikit-learn regression models that additionally expose
 their fitted equations as SymPy symbolic expressions.
 
-This is essential for GWR because the method requires the *analytical
+This is essential for SymGWR because the method requires the *analytical
 gradient* of the base model, which is obtained by differentiating the
 SymPy equation.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Empirical complexity scaling: locked GWR vs GP fit-time stand-in."""
+"""Empirical complexity scaling: locked SymGWR vs GP fit-time stand-in."""
 
 from __future__ import annotations
 
@@ -120,7 +120,7 @@ def _write_companion(
     lines.append("Source: results/complexity_scaling.csv")
     lines.append("Columns used: n, method, measurement_type, mean, std, n_repeats")
     lines.append(f"Split protocol: {split_protocol}")
-    lines.append(f"Locked GWR config: degree=5, k=1, relative=False")
+    lines.append(f"Locked SymGWR config: degree=5, k=1, relative=False")
     lines.append(f"Seed convention: 0..{repeats - 1} (n={repeats})")
     lines.append(f"Single-query methodology: warmed-up, then {n_queries} one-by-one queries with replacement")
     lines.append(f"Maximum train+val pool size under split protocol: {max_train_full_n}")
@@ -146,8 +146,8 @@ def _write_companion(
 def _plot_results(df: pd.DataFrame, out_png: str) -> None:
     plt.figure(figsize=(9, 5.5))
     styles = {
-        ("GWR", "fit_time_s"): ("o-", "GWR fit"),
-        ("GWR", "query_time_s"): ("s-", "GWR single-query"),
+        ("GWR", "fit_time_s"): ("o-", "SymGWR fit"),
+        ("GWR", "query_time_s"): ("s-", "SymGWR single-query"),
         ("GaussianProcess", "fit_time_s"): ("^-", "GP fit (GEK stand-in)"),
     }
     for key, (style, label) in styles.items():
@@ -168,7 +168,7 @@ def _plot_results(df: pd.DataFrame, out_png: str) -> None:
     plt.yscale("log")
     plt.xlabel("Training set size n")
     plt.ylabel("Time (seconds, log scale)")
-    plt.title("Empirical complexity scaling (locked GWR vs GP fit stand-in)")
+    plt.title("Empirical complexity scaling (locked SymGWR vs GP fit stand-in)")
     plt.grid(True, which="both", alpha=0.25)
     plt.legend()
     plt.tight_layout()
@@ -365,8 +365,8 @@ def main() -> None:
         "- Locked v2 file uses a single canonical warmed 10,000-query distribution for quantiles/center.",
         "- Independent multi-process runs are retained as noise characterization, not quantile source.",
         "Measured quantities:",
-        "- GWR fit time: results/complexity_scaling.csv, columns [n, mean, std], filter method=GWR, measurement_type=fit_time_s",
-        "- GWR query time: results/complexity_scaling.csv, columns [n, mean, std], filter method=GWR, measurement_type=query_time_s",
+        "- SymGWR fit time: results/complexity_scaling.csv, columns [n, mean, std], filter method=GWR, measurement_type=fit_time_s",
+        "- SymGWR query time: results/complexity_scaling.csv, columns [n, mean, std], filter method=GWR, measurement_type=query_time_s",
         "- GP fit time (GEK stand-in): results/complexity_scaling.csv, columns [n, mean, std], filter method=GaussianProcess, measurement_type=fit_time_s",
         f"- Locked timing cross-check source: {args.locked_timing_csv}, mode=single_query",
         "Notes:",

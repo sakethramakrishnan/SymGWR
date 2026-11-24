@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Benchmark CALPHAD GWR inference latency on single-point queries."""
+"""Benchmark CALPHAD SymGWR inference latency on single-point queries."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ from gwr.utils import load_dataset, train_val_test_split_df
 CALPHAD_QUERY_TIME_US = None  # TO BE FILLED MANUALLY
 # Ask co-author or CALPHAD software vendor for single-point CALPHAD
 # evaluation time in microseconds on equivalent hardware. This is the
-# critical comparison GWR_timing vs CALPHAD_timing that motivates the
+# critical comparison SymGWR_timing vs CALPHAD_timing that motivates the
 # paper. If unavailable, this gap must appear in the Limitations section.
 
 
@@ -36,7 +36,7 @@ def _timing_stats_us(samples_us: np.ndarray) -> dict[str, float]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="CALPHAD GWR timing benchmark")
+    parser = argparse.ArgumentParser(description="CALPHAD SymGWR timing benchmark")
     parser.add_argument("--data", type=str, default="data/raw/718_all.csv")
     parser.add_argument("--target", type=str, default="Gibbs_energy")
     parser.add_argument("--degree", type=int, default=4)

@@ -2,7 +2,7 @@
 baselines.mlp
 =============
 
-Multi-Layer Perceptron (MLP) regressor baseline for comparison against GWR.
+Multi-Layer Perceptron (MLP) regressor baseline for comparison against SymGWR.
 
 Wraps scikit-learn's ``MLPRegressor`` for a consistent interface with
 the rest of the benchmarking pipeline.

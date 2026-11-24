@@ -38,9 +38,9 @@ def main():
     if gwr is not None and {"gwr_mape_mean_mean", "base_mape_mean_mean"}.issubset(gwr.columns):
         vals = [float(gwr["base_mape_mean_mean"].iloc[0]), float(gwr["gwr_mape_mean_mean"].iloc[0])]
         plt.figure(figsize=(5, 4))
-        plt.bar(["Base", "GWR"], vals)
+        plt.bar(["Base", "SymGWR"], vals)
         plt.ylabel("MAPE")
-        plt.title("GWR vs Base")
+        plt.title("SymGWR vs Base")
         plt.tight_layout()
         plt.savefig(os.path.join(args.figures_dir, "gwr_vs_base_mape.png"), dpi=200)
         plt.close()

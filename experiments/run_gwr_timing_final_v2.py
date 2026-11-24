@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Reproducible locked GWR single-query timing with independent runs.
+"""Reproducible locked SymGWR single-query timing with independent runs.
 
 This script writes:
   - per-run summary table (independent process invocations)
@@ -184,7 +184,7 @@ def _aggregate(run_samples: list[np.ndarray]) -> tuple[pd.DataFrame, dict[str, A
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Reproducible locked GWR timing")
+    parser = argparse.ArgumentParser(description="Reproducible locked SymGWR timing")
     parser.add_argument("--data", type=str, default="data/raw/718_all.csv")
     parser.add_argument("--target", type=str, default="Gibbs_energy")
     parser.add_argument("--degree", type=int, default=5)

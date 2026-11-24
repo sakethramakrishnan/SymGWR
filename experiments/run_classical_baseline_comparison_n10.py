@@ -43,7 +43,7 @@ CLASSICAL_MODELS = {
     "KNN": train_knn,
     "KernelRegression": train_kernel_regression,
 }
-GWR_MODEL_NAME = "Polynomial GWR"
+SymGWR_MODEL_NAME = "Polynomial GWR"
 
 BASELINE_PARAM_GRID: dict[str, list[dict[str, Any]]] = {
     "GaussianProcess": [{"alpha": 1e-6}, {"alpha": 1e-4}],
@@ -221,7 +221,7 @@ def _load_prior_rows(prior_raw_path: str) -> pd.DataFrame:
     if not os.path.isfile(prior_raw_path):
         raise FileNotFoundError(f"Missing prior n=5 raw results: {prior_raw_path}")
     prior = pd.read_csv(prior_raw_path)
-    wanted = set(CLASSICAL_MODELS) | {GWR_MODEL_NAME}
+    wanted = set(CLASSICAL_MODELS) | {SymGWR_MODEL_NAME}
     prior = prior[prior["model"].isin(wanted)]
     prior = prior[prior["random_state"].isin(PRIOR_SEEDS)]
     if prior.empty:
@@ -330,7 +330,7 @@ def main() -> None:
         per_seed_rows.append(
             {
                 "record_type": "per_seed",
-                "model": GWR_MODEL_NAME,
+                "model": SymGWR_MODEL_NAME,
                 "seed": seed,
                 "degree": args.degree,
                 "k": args.neighbors,
@@ -345,7 +345,7 @@ def main() -> None:
             }
         )
         print(
-            f"seed={seed} model={GWR_MODEL_NAME} cache={'hit' if gwr_cached else 'miss'} "
+            f"seed={seed} model={SymGWR_MODEL_NAME} cache={'hit' if gwr_cached else 'miss'} "
             f"mape={gwr_metrics['mape_mean']:.6g}",
             flush=True,
         )
@@ -471,7 +471,7 @@ def main() -> None:
             )
 
     raw_df = pd.DataFrame(per_seed_rows)
-    models = [GWR_MODEL_NAME, *CLASSICAL_MODELS.keys()]
+    models = [SymGWR_MODEL_NAME, *CLASSICAL_MODELS.keys()]
 
     summary_rows: list[dict[str, Any]] = []
     for model_name in models:
@@ -491,12 +491,12 @@ def main() -> None:
             summary[f"{metric}_std"] = std
         summary_rows.append(summary)
 
-    gwr_summary = next(r for r in summary_rows if r["model"] == GWR_MODEL_NAME)
+    gwr_summary = next(r for r in summary_rows if r["model"] == SymGWR_MODEL_NAME)
 
     improvement_rows: list[dict[str, Any]] = []
     significance_rows: list[dict[str, Any]] = []
     for model_name in CLASSICAL_MODELS:
-        gwr_by_seed = raw_df.loc[raw_df["model"] == GWR_MODEL_NAME].sort_values("seed")
+        gwr_by_seed = raw_df.loc[raw_df["model"] == SymGWR_MODEL_NAME].sort_values("seed")
         base_by_seed = raw_df.loc[raw_df["model"] == model_name].sort_values("seed")
         gwr_paired = gwr_by_seed["mape"].to_numpy(dtype=np.float64)
         base_paired = base_by_seed["mape"].to_numpy(dtype=np.float64)

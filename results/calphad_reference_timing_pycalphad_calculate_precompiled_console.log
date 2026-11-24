@@ -22,7 +22,7 @@ pickle_path:     /home/saketh/Documents/saketh/gwr/experiments/calphad_ref_data/
 
 equilibrium_phases: ['LIQUID', 'FCC_A1', 'BCC_A2', 'HCP_A3', 'CEMENTITE', 'SIGMA', 'M23C6', 'M7C3']
 calculate_phase:    FCC_A1
-calculate_reason:   FCC_A1 (austenite) is the substitutional matrix / majority phase for the Fe-Cr-Ni-rich compositions in this query set; single-phase G(X,T) on FCC_A1 is the operation GWR approximates, not multi-phase equilibrium.
+calculate_reason:   FCC_A1 (austenite) is the substitutional matrix / majority phase for the Fe-Cr-Ni-rich compositions in this query set; single-phase G(X,T) on FCC_A1 is the operation SymGWR approximates, not multi-phase equilibrium.
 
 ========================================================================
 pycalphad CALPHAD calculate_precompiled reference timing
@@ -31,7 +31,7 @@ function:        calculate() with phase_records+model reused (NOT bare calculate
 config_id:       calculate_precompiled__mc_fe_v2.059.pycalphad.tdb__8comp__FCC_A1__nq100__9963a5a7898e
 Components:      ['FE', 'CR', 'NI', 'C', 'MN', 'MO', 'SI', 'VA']
 phase:           FCC_A1
-phase_reason:    FCC_A1 (austenite) is the substitutional matrix / majority phase for the Fe-Cr-Ni-rich compositions in this query set; single-phase G(X,T) on FCC_A1 is the operation GWR approximates, not multi-phase equilibrium.
+phase_reason:    FCC_A1 (austenite) is the substitutional matrix / majority phase for the Fe-Cr-Ni-rich compositions in this query set; single-phase G(X,T) on FCC_A1 is the operation SymGWR approximates, not multi-phase equilibrium.
 precompile_note: Model + PhaseRecordFactory built once before warm-up; passed to every calculate() via phase_records=... and model=...
 n_query_points:  8
 n_timed_queries: 100

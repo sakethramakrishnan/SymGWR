@@ -1,0 +1,32 @@
+key,value
+cpu_model,AMD Ryzen 7 5700U with Radeon Graphics
+python,3.14.4
+numpy,2.5.1
+scipy,1.18.0
+sklearn,1.9.0
+platform,Linux-7.0.0-43-generic-x86_64-with-glibc2.43
+pinned_core,10
+smt_sibling,11
+OMP_NUM_THREADS,1
+loadavg_start_1_5_15,0.99|1.31|1.38
+core_busy_at_start,0.091
+sibling_busy_at_start,0.055
+git_commit,a34d505
+start_time,2026-11-22 14:10:15
+n_timed_queries,10000
+n_warmup_queries,2000
+repeats,3
+jitter_frac_of_std,0.01
+poly_degree,5
+split,random seed 42
+kdtree_features,all 8 numeric feature cols in scaled space: Mass_fraction_Nb|Mass_fraction_Al|Mass_fraction_Ti|Mass_fraction_Mo|Mass_fraction_Fe|Mass_fraction_Ni|Mass_fraction_Cr|Temperature_[K]
+ni_in_tree,"yes (column present) but constant: scaled value 0 for every ref/query, so it adds 0 to every distance"
+tree_effective_dims,7
+load_discard_rule,discard attempt if 10s-rolling external busy cores + 1 > 2.0
+gc_during_timing,disabled
+gradient_path,"gwr.gradients.evaluate_polynomial_pipeline_gradients (explicit, no SymPy)"
+n_real_refs,6350
+n_test,1588
+feature_cols,Mass_fraction_Nb|Mass_fraction_Al|Mass_fraction_Ti|Mass_fraction_Mo|Mass_fraction_Fe|Mass_fraction_Ni|Mass_fraction_Cr|Temperature_[K]
+n_rows_after_dedupe,7938
+n_poly_terms,1287

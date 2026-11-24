@@ -2,7 +2,7 @@
 gwr.core
 ========
 
-Main Gradient-Weighted Regression (GWR) implementation.
+Main Gradient-Weighted Regression (SymGWR) implementation.
 
 The ``GradientWeightedRegressor`` takes a closed-form base model (expressed as
 a SymPy equation), computes its analytical gradient at every reference point,
@@ -28,7 +28,7 @@ from gwr.neighbors import AbsoluteNeighborSelector, RelativeNeighborSelector
 
 
 class GradientWeightedRegressor:
-    """Gradient-Weighted Regression (GWR) predictor.
+    """Gradient-Weighted Regression (SymGWR) predictor.
 
     Parameters
     ----------
@@ -219,7 +219,7 @@ class GradientWeightedRegressor:
         targets: np.ndarray,
         weights: np.ndarray,
     ) -> np.ndarray:
-        """Vectorised GWR prediction via first-order Taylor extrapolation."""
+        """Vectorised SymGWR prediction via first-order Taylor extrapolation."""
         # directions: (n_query, k, n_features)
         directions = query_points[:, np.newaxis, :] - closest_features
 
@@ -251,7 +251,7 @@ class GradientWeightedRegressor:
 
 
 class PipelineGradientWeightedRegressor:
-    """GWR using a fitted sklearn polynomial pipeline (no SymPy).
+    """SymGWR using a fitted sklearn polynomial pipeline (no SymPy).
 
     Same neighbour / Taylor extrapolation logic as ``GradientWeightedRegressor``,
     but gradients come from ``evaluate_polynomial_pipeline_gradients`` so

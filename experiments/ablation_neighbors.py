@@ -3,7 +3,7 @@
 experiments/ablation_neighbors.py
 =================================
 
-Ablation study over the number of neighbours *k* in GWR.
+Ablation study over the number of neighbours *k* in SymGWR.
 
 Sweeps k = 1 … max_k for both absolute and relative neighbour strategies
 and records RMSE / R² / MAPE / SMAPE for each configuration.
