@@ -1,5 +1,5 @@
 ================================================================================
-GWR EVALUATION RESULTS - ALL POLYNOMIAL DEGREES (1-10) × NEIGHBORS (1-10)
+SymGWR EVALUATION RESULTS - ALL POLYNOMIAL DEGREES (1-10) × NEIGHBORS (1-10)
 ================================================================================
 
 COMPLETION STATUS: ✓ COMPLETE (100/100 configurations evaluated)

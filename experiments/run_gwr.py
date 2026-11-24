@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Run GWR with repeated train/val/test evaluation."""
+"""Run SymGWR with repeated train/val/test evaluation."""
 
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ def _fit_base_model(base_model: str, X_train: np.ndarray, y_train: np.ndarray, X
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run GWR experiment")
+    parser = argparse.ArgumentParser(description="Run SymGWR experiment")
     parser.add_argument("--data", type=str, required=True, help="Path to CSV dataset")
     parser.add_argument("--target", type=str, default="Gibbs_energy")
     parser.add_argument("--base-model", type=str, default="polynomial", choices=["polynomial", "linear", "ridge", "lasso"])
@@ -144,7 +144,7 @@ def main():
         )
         print(
             f"[{rep + 1}/{args.repeats}] k={best_cfg['n_neighbors']} deg={best_cfg['degree']} "
-            f"GWR MSE={gwr_metrics['mse']:.6f} MAPE={gwr_metrics['mape_mean']:.6f}"
+            f"SymGWR MSE={gwr_metrics['mse']:.6f} MAPE={gwr_metrics['mape_mean']:.6f}"
         )
 
     base_agg = aggregate_metric_dicts(base_metrics_repeats)

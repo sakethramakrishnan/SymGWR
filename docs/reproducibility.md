@@ -11,7 +11,7 @@ conda activate gwr
 
 ## Main experiment commands
 
-### 1) GWR with repeated train/val/test
+### 1) SymGWR with repeated train/val/test
 
 ```bash
 python -m experiments.run_gwr \

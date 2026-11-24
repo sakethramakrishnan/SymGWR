@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-"""Corrected k-sweep and degree-sweep for locked GWR config selection.
+"""Corrected k-sweep and degree-sweep for locked SymGWR config selection.
 
 Protocol (matches ``run_joint_grid.py`` / ``joint_grid_n10_final.csv``):
 - split 0.6 / 0.2 / 0.2
-- fit base polynomial + GWR on ``X_train`` only
+- fit base polynomial + SymGWR on ``X_train`` only
 - k-sweep: evaluate on ``X_val`` (selection split)
 - degree-sweep: train MAPE = per-element closed-form polynomial on train split
-  (original Figure 6 "Avg Training MAPE (Element-wise)"); test MAPE = full GWR
+  (original Figure 6 "Avg Training MAPE (Element-wise)"); test MAPE = full SymGWR
   on held-out test split
 - seeds 0..9 (n=10)
 """
@@ -150,7 +150,7 @@ def _eval_mape(
 
 
 def _eval_element_train_mape(element_train: dict[str, tuple[np.ndarray, np.ndarray]], degree: int) -> float:
-    """Per-element closed-form polynomial train MAPE (no GWR neighbor lookup)."""
+    """Per-element closed-form polynomial train MAPE (no SymGWR neighbor lookup)."""
     mapes: list[float] = []
     for X, y in element_train.values():
         model = Pipeline(
@@ -421,7 +421,7 @@ def plot_k_sweep(
     ax.set_xlabel("Number of absolute neighbors k", fontsize=11, fontweight="bold")
     ax.set_ylabel("Validation MAPE (log scale)", fontsize=11, fontweight="bold")
     ax.set_title(
-        f"GWR validation MAPE vs. k (degree={LOCKED_DEGREE}, n={len(SEEDS)} seeds)",
+        f"SymGWR validation MAPE vs. k (degree={LOCKED_DEGREE}, n={len(SEEDS)} seeds)",
         fontsize=12,
         fontweight="bold",
     )
@@ -542,7 +542,7 @@ def plot_degree_sweep(summary: pd.DataFrame, out_png: str, out_txt: str | None =
                 f"Filters: k={LOCKED_K}, degree={min(DEGREE_VALUES)}..{max(DEGREE_VALUES)}",
                 f"n: {len(SEEDS)} seeds (0..9)",
                 "Protocol: train MAPE = per-element closed-form polynomial on X_train; "
-                "test MAPE = full GWR (k=1) on X_test",
+                "test MAPE = full SymGWR (k=1) on X_test",
                 f"degree=1 mean train MAPE (element-wise): {deg1_train}",
                 f"degree={LOCKED_DEGREE}: train MAPE={deg5_train}, test MAPE={deg5_test}",
                 f"Lowest mean test MAPE at degree={best_test_degree}",

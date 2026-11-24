@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Derivative evaluation for GWR and selected baselines.
+"""Derivative evaluation for SymGWR and selected baselines.
 
 If true derivative columns are unavailable, this script uses a local finite-difference
 proxy estimated from nearest-neighbour linear fits and records the limitation.
@@ -55,7 +55,7 @@ def _detect_true_derivatives(df: pd.DataFrame, target_col: str) -> List[str]:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Derivative evaluation for GWR")
+    parser = argparse.ArgumentParser(description="Derivative evaluation for SymGWR")
     parser.add_argument("--data", type=str, required=True)
     parser.add_argument("--target", type=str, default="Gibbs_energy")
     parser.add_argument("--degree", type=int, default=3)

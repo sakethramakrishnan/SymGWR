@@ -2,7 +2,7 @@
 gwr.neighbors
 =============
 
-Neighbour selection strategies for GWR.
+Neighbour selection strategies for SymGWR.
 
 * **AbsoluteNeighborSelector** – picks the *k* globally closest points.
 * **RelativeNeighborSelector** – picks *k* closest points *per class/group*

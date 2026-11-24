@@ -2,7 +2,7 @@
 baselines.symbolic_pysr
 =======================
 
-PySR (symbolic regression) baseline for comparison against GWR.
+PySR (symbolic regression) baseline for comparison against SymGWR.
 
 PySR discovers interpretable mathematical expressions from data using
 evolutionary search.  This module wraps the ``PySRRegressor`` with

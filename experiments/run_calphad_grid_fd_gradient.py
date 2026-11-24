@@ -24,7 +24,7 @@ points and converted to raw units by the chain rule
 Two estimators are reported:
   poly   analytic polynomial gradient at the query point itself
   gwr_k1 gradient of the polynomial at the nearest fit (train+val) reference
-         point in scaled feature space (the GWR k=1 rule; the convention of the
+         point in scaled feature space (the SymGWR k=1 rule; the convention of the
          older version of this check)
 
 Two point sets per seed (random split, seeds 42..51, polynomial fit on train+val):
@@ -526,7 +526,7 @@ def main() -> None:
         f_scale = np.asarray(sp.feature_scaler.scale_)
         g_raw = g_scaled * (t_scale / f_scale)[None, :]
 
-        # GWR k=1: gradient at nearest fit reference point (scaled space)
+        # SymGWR k=1: gradient at nearest fit reference point (scaled space)
         tree = cKDTree(X_fit)
         _, nn = tree.query(X_all, k=1)
         g_raw_k1 = g_raw[fit_idx[nn]]

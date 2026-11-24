@@ -240,7 +240,7 @@ def plot_k_sweep_families(summary: pd.DataFrame, out_png: str, locked_k: int = L
     ax.set_xlabel("Number of Nearest Absolute Neighbors (K)", fontsize=11)
     ax.set_ylabel("Validation MAPE (log scale)", fontsize=11)
     ax.set_title(
-        "MAPE vs. Number of Absolute Neighbors (GWR Local Approximation)\n"
+        "MAPE vs. Number of Absolute Neighbors (SymGWR Local Approximation)\n"
         f"(global base fit on train, evaluate val, n={K_SWEEP_SEEDS[0]}..{K_SWEEP_SEEDS[-1]} seeds)",
         fontsize=12,
         fontweight="bold",

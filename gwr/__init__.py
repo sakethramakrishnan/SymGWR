@@ -1,5 +1,5 @@
 """
-Gradient-Weighted Regression (GWR)
+Gradient-Weighted Regression (SymGWR)
 ===================================
 
 A local regression method that uses analytical gradient information from

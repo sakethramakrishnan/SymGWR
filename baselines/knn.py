@@ -2,9 +2,9 @@
 baselines.knn
 =============
 
-K-Nearest Neighbours regressor baseline for comparison against GWR.
+K-Nearest Neighbours regressor baseline for comparison against SymGWR.
 
-While GWR also uses nearest neighbours, the key difference is that GWR
+While SymGWR also uses nearest neighbours, the key difference is that SymGWR
 extrapolates from neighbours using analytical gradient information,
 whereas vanilla KNN simply averages (or distance-weights) neighbour targets.
 """

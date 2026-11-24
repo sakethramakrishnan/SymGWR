@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-"""Matched train/val MAPE degree sweep via full GWR pipeline (k=1 locked).
+"""Matched train/val MAPE degree sweep via full SymGWR pipeline (k=1 locked).
 
 Same protocol as ``run_corrected_sweeps.run_k_sweep`` / ``joint_grid_n10_full.csv``:
-60/20/20 split, fit base polynomial + GWR on X_train, evaluate MAPE on train and val.
+60/20/20 split, fit base polynomial + SymGWR on X_train, evaluate MAPE on train and val.
 Writes ``results/degree_sweep_matched_train_val_n10.csv`` only (no locked CSV edits).
 """
 
@@ -106,7 +106,7 @@ def run_matched_degree_sweep(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Matched GWR train/val degree sweep")
+    parser = argparse.ArgumentParser(description="Matched SymGWR train/val degree sweep")
     parser.add_argument("--data", type=str, default="data/raw/718_all.csv")
     parser.add_argument("--target", type=str, default="Gibbs_energy")
     parser.add_argument("--output", type=str, default=DEFAULT_OUTPUT)

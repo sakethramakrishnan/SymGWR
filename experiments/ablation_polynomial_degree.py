@@ -3,10 +3,10 @@
 experiments/ablation_polynomial_degree.py
 =========================================
 
-Ablation study over polynomial degree of the base model in GWR.
+Ablation study over polynomial degree of the base model in SymGWR.
 
 For each degree in [1 … max_degree], fits a polynomial base model,
-runs GWR (with a fixed number of neighbours), and reports metrics.
+runs SymGWR (with a fixed number of neighbours), and reports metrics.
 
 Usage
 -----
@@ -92,7 +92,7 @@ def main():
                 y_pred_gwr = gwr.predict(X_test)
                 gwr_metrics = compute_all_metrics(y_test, y_pred_gwr)
             except Exception as e:
-                print(f"    GWR failed for degree {deg}: {e}")
+                print(f"    SymGWR failed for degree {deg}: {e}")
                 gwr_metrics = {k: np.nan for k in base_metrics}
             gwr_repeats.append(gwr_metrics)
 
@@ -106,7 +106,7 @@ def main():
 
         print(
             f"    Base MSE={row['base_mse_mean']:.6f}  "
-            f"GWR MSE={row['gwr_mse_mean']:.6f}"
+            f"SymGWR MSE={row['gwr_mse_mean']:.6f}"
         )
 
     df_out = pd.DataFrame(rows)

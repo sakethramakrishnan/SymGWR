@@ -10,7 +10,7 @@ Two separate measurements (never averaged / conflated):
 
   calculate()
     Direct single-phase Gibbs energy G(composition, T) evaluation -- the
-    operation comparable to what the GWR surrogate replaces. Restricted to
+    operation comparable to what the SymGWR surrogate replaces. Restricted to
     one representative matrix phase (FCC_A1). Raw timings written to a
     separate CSV; never overwrites the equilibrium CSV.
     Default path calls pycalphad.calculate(db, comps, phase, ...) each query
@@ -89,12 +89,12 @@ PHASE_CANDIDATES = [
 
 # Austenitic Fe-Cr-Ni matrix phase: majority phase for stainless-like
 # compositions in QUERY_POINTS (elevated Ni/Cr). Single-phase G(X,T)
-# evaluation -- apples-to-apples with GWR surrogate target.
+# evaluation -- apples-to-apples with SymGWR surrogate target.
 CALCULATE_PHASE = "FCC_A1"
 CALCULATE_PHASE_REASON = (
     "FCC_A1 (austenite) is the substitutional matrix / majority phase for "
     "the Fe-Cr-Ni-rich compositions in this query set; single-phase G(X,T) "
-    "on FCC_A1 is the operation GWR approximates, not multi-phase equilibrium."
+    "on FCC_A1 is the operation SymGWR approximates, not multi-phase equilibrium."
 )
 
 QUERY_POINTS = [
@@ -1045,7 +1045,7 @@ def main() -> None:
             )
         print()
         print("NOTE: calculate() = single-phase G(X,T); equilibrium() = multiphase solve.")
-        print("GWR surrogate compares to calculate(), not equilibrium().")
+        print("SymGWR surrogate compares to calculate(), not equilibrium().")
         print()
 
     if calc_pre_result is not None:

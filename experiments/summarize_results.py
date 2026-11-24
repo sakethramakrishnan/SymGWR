@@ -281,7 +281,7 @@ def build_baseline(
     require_columns(source, headers, ["model", "mae_mean", "mse", "rmse", "mape_mean", "smape_mean", "r2", "time_s"])
     candidates = [row for row in rows if "gwr" not in str(row.get("model", "")).lower()]
     if not candidates:
-        raise RuntimeError("No non-GWR baseline rows found")
+        raise RuntimeError("No non-SymGWR baseline rows found")
 
     gwr_values = {
         "mae": to_float(calphad["best_row"]["gwr_mae_mean"]),
@@ -327,7 +327,7 @@ def build_baseline(
             raise RuntimeError(f"No metric direction configured for {metric}")
         gwr_val = gwr_values[metric]
         if gwr_val is None:
-            raise RuntimeError(f"GWR comparator missing for metric {metric}")
+            raise RuntimeError(f"SymGWR comparator missing for metric {metric}")
         absolute = (best_val - gwr_val) if metric in LOWER_IS_BETTER else (gwr_val - best_val)
         percent = NA if best_val == 0 else (absolute / abs(best_val)) * 100.0
         config = row_config(best_row, best_idx)
@@ -479,7 +479,7 @@ def build_runtime(
     canonical_files: Dict[str, str],
     csv_cache: Dict[str, Tuple[List[str], List[Dict[str, str]]]],
 ) -> Dict[str, Any]:
-    gwr_source = canonical_files["RUNTIME_GWR"]
+    gwr_source = canonical_files["RUNTIME_SymGWR"]
     gwr_headers, gwr_rows = csv_cache[gwr_source]
     require_columns(gwr_source, gwr_headers, ["gwr_time_s_mean"])
     if not gwr_rows:
@@ -682,7 +682,7 @@ def build_summary_markdown(
                 f"- {stat_id}: value={fmt(s.value)}; source={s.source_file}; row={s.row_configuration}; metric={s.metric}{reason}"
             )
     lines.append("")
-    lines.append("## Baseline Improvements (positive means GWR better)")
+    lines.append("## Baseline Improvements (positive means SymGWR better)")
     for metric in ["mae", "mse", "rmse", "mape", "smape", "r2", "runtime"]:
         item = baseline_meta[metric]
         lines.append(
@@ -747,7 +747,7 @@ def build_manuscript_markdown(
         item = baseline_meta[metric]
         lines.append(
             f"- {metric}: strongest baseline={item['baseline_model']} ({fmt(item['baseline_value'])}); "
-            f"GWR={fmt(item['gwr_value'])}; absolute improvement={fmt(item['absolute_improvement'])}; "
+            f"SymGWR={fmt(item['gwr_value'])}; absolute improvement={fmt(item['absolute_improvement'])}; "
             f"percent improvement={fmt(item['percent_improvement'])}."
         )
     lines.append("")
@@ -759,7 +759,7 @@ def build_manuscript_markdown(
     lines.append("")
     lines.append("# Runtime")
     lines.append(
-        f"End-to-end runtime only: GWR={fmt(r['gwr_end_to_end_runtime'].value)}, "
+        f"End-to-end runtime only: SymGWR={fmt(r['gwr_end_to_end_runtime'].value)}, "
         f"fastest baseline={fmt(r['fastest_baseline_end_to_end_runtime'].value)}, "
         f"slowest baseline={fmt(r['slowest_baseline_end_to_end_runtime'].value)}."
     )

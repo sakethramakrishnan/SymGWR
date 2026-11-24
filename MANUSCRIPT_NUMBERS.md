@@ -19,11 +19,11 @@
 - Held-out-vs-validation note (Sections 6.4/7.x): this held-out test-set MAPE differs from validation-split config-selection MAPE `7.5812705117366e-4` in Section 7.2b by design (validation drives selection; held-out test reports post-selection generalization).
 
 ## 4) Baseline comparison (Issue O locked numbers, no recompute)
-- Source: `results/full_baseline_improvement.csv`, filtered to `metric=mape` (`n=5` for GWR row inherited from `full_baseline_summary.csv`).
-- GWR vs `GaussianProcess` MAPE percent improvement = `59.67975374940865%` (`n=5`; source: `results/full_baseline_improvement.csv`, col `percent_improvement`).
-- GWR vs `LOESS` MAPE percent improvement = `99.51286367840356%` (`n=5`; source: `results/full_baseline_improvement.csv`, col `percent_improvement`).
-- GWR vs `KNN` MAPE percent improvement = `99.62332405721169%` (`n=5`; source: `results/full_baseline_improvement.csv`, col `percent_improvement`).
-- GWR vs `KernelRegression` MAPE percent improvement = `99.76934676737747%` (`n=5`; source: `results/full_baseline_improvement.csv`, col `percent_improvement`).
+- Source: `results/full_baseline_improvement.csv`, filtered to `metric=mape` (`n=5` for SymGWR row inherited from `full_baseline_summary.csv`).
+- SymGWR vs `GaussianProcess` MAPE percent improvement = `59.67975374940865%` (`n=5`; source: `results/full_baseline_improvement.csv`, col `percent_improvement`).
+- SymGWR vs `LOESS` MAPE percent improvement = `99.51286367840356%` (`n=5`; source: `results/full_baseline_improvement.csv`, col `percent_improvement`).
+- SymGWR vs `KNN` MAPE percent improvement = `99.62332405721169%` (`n=5`; source: `results/full_baseline_improvement.csv`, col `percent_improvement`).
+- SymGWR vs `KernelRegression` MAPE percent improvement = `99.76934676737747%` (`n=5`; source: `results/full_baseline_improvement.csv`, col `percent_improvement`).
 - Documented compute-cost exception (Issue O/Q): baseline table remains `n=5` because GaussianProcess runtime cost made `n=10` baseline reruns impractical in that pass.
 
 ## 5) Derivative validation (synthetic v2)
@@ -42,10 +42,10 @@
 - Same-environment self-consistency check (complexity sweep at `n=8181`): `61.135827` us lies within v2 canonical range `[49.062, 184.828]` and within v2 `p50..p99` interval `[61.075, 114.9305100000001]` (source: `figures/complexity_scaling.txt`, `results/task1_complexity_summary_report.txt`).
 
 ## 7) PMLB results and significance
-- Median MAPE/SMAPE summary from `results/pmlb_metrics_summary.csv` (canonical baseline/GWR models, each `n=213` datasets):
-- Linear family: baseline median MAPE/SMAPE = `0.758672181874` / `0.492292632005` vs GWR median MAPE/SMAPE = `0.0965042869715` / `0.0871392082956` (source cols `mape_mean`, `smape_mean`; `n=213`).
-- Ridge family: baseline median MAPE/SMAPE = `0.758659983647` / `0.4906714389` vs GWR median MAPE/SMAPE = `0.101000832059` / `0.0881274591022` (source cols `mape_mean`, `smape_mean`; `n=213`).
-- Polynomial family: baseline median MAPE/SMAPE = `0.346519905539` / `0.282215561592` vs GWR median MAPE/SMAPE = `0.0979628551122` / `0.0721817218425` (source cols `mape_mean`, `smape_mean`; `n=213`).
+- Median MAPE/SMAPE summary from `results/pmlb_metrics_summary.csv` (canonical baseline/SymGWR models, each `n=213` datasets):
+- Linear family: baseline median MAPE/SMAPE = `0.758672181874` / `0.492292632005` vs SymGWR median MAPE/SMAPE = `0.0965042869715` / `0.0871392082956` (source cols `mape_mean`, `smape_mean`; `n=213`).
+- Ridge family: baseline median MAPE/SMAPE = `0.758659983647` / `0.4906714389` vs SymGWR median MAPE/SMAPE = `0.101000832059` / `0.0881274591022` (source cols `mape_mean`, `smape_mean`; `n=213`).
+- Polynomial family: baseline median MAPE/SMAPE = `0.346519905539` / `0.282215561592` vs SymGWR median MAPE/SMAPE = `0.0979628551122` / `0.0721817218425` (source cols `mape_mean`, `smape_mean`; `n=213`).
 - Significance stats from `results/pmlb_significance_tests_final.csv` (rank tests `n=213`, excl-nearzero-delta summaries `n=195`):
 - `Linear Regression` vs `Linear GWR`: test_statistic=`16.1669847461`, p-value bound=`< 5e-324`, BH-FDR q=`4.94065645841e-324`, median_delta_mape (`n=213`) = `0.386757021832`, mean_delta_mape_excl_nearzero (`n=195`) = `1.516012567716656` (`n_for_rank_test=213`, `n_for_delta_excl_nearzero=195`).
 - `Ridge Regression` vs `Ridge GWR`: test_statistic=`16.2498147523`, p-value bound=`< 5e-324`, BH-FDR q=`4.94065645841e-324`, median_delta_mape (`n=213`) = `0.386748792751`, mean_delta_mape_excl_nearzero (`n=195`) = `1.5141927054371715` (`n_for_rank_test=213`, `n_for_delta_excl_nearzero=195`).
@@ -55,7 +55,7 @@
 
 ## 8) Known open limitations to state in manuscript
 - Interpolation regime support sentence source: `results/interpolation_check_locked.csv` reports `fraction_test_fully_inside_training_bbox=1.0`, `fraction_test_with_any_out_of_range_dimension=0.0`, `out_of_range_dimensions=none` (100% inside training bounding box under locked `0.6/0.2/0.2` split).
-- CALPHAD absolute single-query time is still unavailable (co-author reply pending, status per Issue R), so no CALPHAD-vs-GWR speedup ratio can be computed yet; only GWR absolute query-time numbers are currently reportable.
+- CALPHAD absolute single-query time is still unavailable (co-author reply pending, status per Issue R), so no CALPHAD-vs-SymGWR speedup ratio can be computed yet; only SymGWR absolute query-time numbers are currently reportable.
 - Repository URL `https://github.com/sakethramakrishnan/gwr` still returns 404 (Issue R), so repo link remains blocked for manuscript citation until accessibility is fixed.
 
 ## 9) Tables 2/3 refresh (locked baseline table, n=10)
@@ -68,8 +68,8 @@
 - Decision Tree: MAPE `0.0896272467962253 +/- 0.03615896088116593`.
 - PySR: MAPE `0.22833348391899597 +/- 0.07927726321561232`.
 
-## 10) RQ4 t-test refresh (GWR vs best black-box baseline)
+## 10) RQ4 t-test refresh (SymGWR vs best black-box baseline)
 - Source: `results/rq4_ttest_locked.csv`.
 - Best black-box baseline in refreshed table is `XGBoost` (lowest baseline MAPE).
-- Welch two-sample t-test on pooled absolute percentage errors (`GWR - XGBoost`): `t=-4.658433533969057`, `p=3.211305696642254e-06`, `n=16370` per group.
-- Direction note required in prose/caption: negative t-stat sign indicates GWR mean error is lower than XGBoost.
+- Welch two-sample t-test on pooled absolute percentage errors (`SymGWR - XGBoost`): `t=-4.658433533969057`, `p=3.211305696642254e-06`, `n=16370` per group.
+- Direction note required in prose/caption: negative t-stat sign indicates SymGWR mean error is lower than XGBoost.

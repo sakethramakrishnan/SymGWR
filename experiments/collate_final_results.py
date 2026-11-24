@@ -116,7 +116,7 @@ def main() -> None:
             f"(source: results/full_baseline_summary.csv, cols=mape_mean,mape_std); "
             f"Polynomial GWR MAPE={_fmt_mean_std(gwr_mape_mean, gwr_mape_std)} "
             f"(source: results/full_baseline_summary.csv, model=Polynomial GWR); "
-            f"GWR absolute improvement={float(imp_row['absolute_improvement']):.6g}, "
+            f"SymGWR absolute improvement={float(imp_row['absolute_improvement']):.6g}, "
             f"percent improvement={float(imp_row['percent_improvement']):.6g}% "
             f"(source: results/full_baseline_improvement.csv, model={model}, metric=mape)."
         )

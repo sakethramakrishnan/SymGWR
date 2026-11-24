@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Synthetic iterative-loop stability demo using locked GWR model."""
+"""Synthetic iterative-loop stability demo using locked SymGWR model."""
 
 from __future__ import annotations
 
@@ -179,7 +179,7 @@ def _plot(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Synthetic iterative-loop GWR stability demo")
+    parser = argparse.ArgumentParser(description="Synthetic iterative-loop SymGWR stability demo")
     parser.add_argument("--data", type=str, default="data/raw/718_all.csv")
     parser.add_argument("--target", type=str, default="Gibbs_energy")
     parser.add_argument("--train-frac", type=float, default=0.6)

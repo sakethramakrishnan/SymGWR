@@ -433,7 +433,7 @@ def plot_overfitting_comparison(summary: pd.DataFrame, out_png: str) -> None:
     ax.set_xlabel("Polynomial degree")
     ax.set_ylabel("Mean MAPE (log scale)")
     ax.set_title(
-        f"Matched GWR overfitting (k={LOCKED_K}, n={summary['n_seeds'].iloc[0]} seeds)"
+        f"Matched SymGWR overfitting (k={LOCKED_K}, n={summary['n_seeds'].iloc[0]} seeds)"
     )
     ax.set_xticks(list(degrees))
     ax.grid(True, which="both", alpha=0.3)
